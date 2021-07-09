@@ -28,4 +28,15 @@ router.get('/ofCustomer/:customer_id', async (request, response) => {
   }
 })
 
+//router.post('/', async (request, response) => {
+  //const itemsOfOrder = request.body
+  // itemsOfOrder.length
+  // itemsOfOrder[0]
+  // itemsOfOrder[0].product_id
+  //for(let item of itemsOfOrder){
+  //  const product = await database.query('SELECT * FROM public.Product WHERE id = $1', [item.product_id])
+  //}
+
+//})
+
 module.exports = router

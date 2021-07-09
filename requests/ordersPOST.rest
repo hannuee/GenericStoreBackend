@@ -1,0 +1,10 @@
+POST http://localhost:3001/api/orders
+Content-Type: application/json
+
+[
+    {
+        "product_id": 1,
+        "priceAndSize": { "price": 120000, "size": "5 seater" },
+        "quantity": 1
+    }
+]
