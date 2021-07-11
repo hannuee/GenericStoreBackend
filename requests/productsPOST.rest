@@ -1,0 +1,11 @@
+POST http://localhost:3001/api/products
+Content-Type: application/json
+
+
+{
+    "parentCategoryId": 2,
+    "name": "BMW X6",
+    "description": "Coupe SUV",
+    "pricesAndSizes": [ { "price": 160000, "size": "5 seater" } ],
+    "available": true
+}

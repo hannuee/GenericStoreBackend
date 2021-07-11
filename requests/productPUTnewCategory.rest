@@ -1,0 +1,8 @@
+PUT http://localhost:3001/api/products/newCategory
+Content-Type: application/json
+
+
+{
+    "id": 3,
+    "parentCategoryId": 1
+}

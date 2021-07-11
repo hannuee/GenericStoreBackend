@@ -44,7 +44,7 @@ router.post('/', async (request, response) => {
 
     if(!product.available) console.log('PRODUCT NOT AVAILABLE') // Product must be available.
 
-    const found = product.pricesandsizes.find(element => {  // Item's priceAndSize details must match priceAndSize details in the DB.
+    const found = product.pricesandsizes.arr.find(element => {  // Item's priceAndSize details must match priceAndSize details in the DB.
        return element.price === item.priceAndSize.price && element.size === item.priceAndSize.size
     });
     if(found === undefined) console.log('FAIL')

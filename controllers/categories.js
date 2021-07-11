@@ -13,7 +13,7 @@ router.get('/', async (request, response) => {
 router.post('/', async (request, response) => {
   const categoryToAdd = request.body
 
-  const categoryInsertResult = await database.query('INSERT INTO public.Category(category_id, name) VALUES($1, $2) RETURNING id', [categoryToAdd.parentCategoryId, categoryToAdd.name])
+  const categoryInsertResult = await database.query('INSERT INTO public.Category(category_id, name, description) VALUES($1, $2, $3) RETURNING id', [categoryToAdd.parentCategoryId, categoryToAdd.name, categoryToAdd.description])
   if(categoryInsertResult.rows.length !== 1) console.log('FAILinsert')
 })
 
@@ -25,6 +25,15 @@ router.delete('/:id', async (request, response) => {
   } catch (err) {
     response.json(err)
   }
+})
+
+router.put('/newCategory', async (request, response) => {
+  const categoryToModify = request.body
+
+  const text = 'UPDATE public.Category SET category_id = $1 WHERE id = $2 RETURNING id'
+  const values = [categoryToModify.parentCategoryId, categoryToModify.id]
+  const categoryModificationResult = await database.query(text, values)
+  if(categoryModificationResult.rows.length !== 1) console.log('FAILinsert')
 })
 
 module.exports = router
