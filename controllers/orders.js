@@ -68,4 +68,22 @@ router.post('/', async (request, response) => {
   }
 })
 
+router.put('/internalNotes', async (request, response) => {
+  const orderToModify = request.body
+
+  const text = 'UPDATE public.Order SET internalNotes = $1 WHERE id = $2 RETURNING id'
+  const values = [orderToModify.internalNotes, orderToModify.id]
+  const orderModificationResult = await database.query(text, values)
+  if(orderModificationResult.rows.length !== 1) console.log('FAILinsert')
+})
+
+router.put('/orderDispatced', async (request, response) => {
+  const orderToModify = request.body
+
+  const text = 'UPDATE public.Order SET orderDispatched = CURRENT_TIMESTAMP WHERE id = $1 RETURNING id'
+  const values = [orderToModify.id]
+  const orderModificationResult = await database.query(text, values)
+  if(orderModificationResult.rows.length !== 1) console.log('FAILinsert')
+})
+
 module.exports = router

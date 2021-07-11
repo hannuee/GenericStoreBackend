@@ -1,0 +1,8 @@
+PUT http://localhost:3001/api/orders/internalNotes
+Content-Type: application/json
+
+
+{
+    "id": 2,
+    "internalNotes": "Watch out the dog on the yard!"
+}

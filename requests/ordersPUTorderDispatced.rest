@@ -1,0 +1,7 @@
+PUT http://localhost:3001/api/orders/orderDispatced
+Content-Type: application/json
+
+
+{
+    "id": 2
+}

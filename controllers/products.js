@@ -46,4 +46,13 @@ router.put('/newCategory', async (request, response) => {
   if(productModificationResult.rows.length !== 1) console.log('FAILinsert')
 })
 
+router.put('/pricesAndSizes', async (request, response) => {
+  const productToModify = request.body
+  
+  const text = 'UPDATE public.Product SET pricesAndSizes = $1 WHERE id = $2 RETURNING id'
+  const values = [{ arr: productToModify.pricesAndSizes}, productToModify.id]
+  const productModificationResult = await database.query(text, values)
+  if(productModificationResult.rows.length !== 1) console.log('FAILinsert')
+})
+
 module.exports = router
