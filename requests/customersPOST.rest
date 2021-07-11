@@ -1,0 +1,10 @@
+POST http://localhost:3001/api/customers
+Content-Type: application/json
+
+{
+    "name": "Veikko",
+    "address": "Vaasa",
+    "mobile": "045 1234567",
+    "email": "veikko@suo.mi",
+    "password": "Tosi salainen"
+}
