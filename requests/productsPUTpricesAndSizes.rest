@@ -3,6 +3,6 @@ Content-Type: application/json
 
 
 {
-    "id": 1,
-    "pricesAndSizes": [ { "price": 130000, "size": "5 seater" } ]
+    "id": 2,
+    "pricesAndSizes": [ { "price": 110000, "size": "5 seater" } ]
 }

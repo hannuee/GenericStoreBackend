@@ -1,5 +1,6 @@
 const router = require('express').Router()
 const database = require('../database')
+const validate = require('../validators')
 
 router.get('/', async (request, response) => {
     try {
@@ -20,8 +21,11 @@ router.get('/undispatched', async (request, response) => {
 })
 
 router.get('/ofCustomer/:customer_id', async (request, response) => {
+  const customerIdToGetOrders = { id: Number(request.params.customer_id)}
+  if (!validate.id(customerIdToGetOrders)) return response.status(400).send()
+  
   try {
-    const results = await database.query('SELECT * FROM public.Order WHERE customer_id = $1', [request.params.customer_id])
+    const results = await database.query('SELECT * FROM public.Order WHERE customer_id = $1', [customerIdToGetOrders.id])
     response.json(results.rows)
   } catch (err) {
     response.json(err)
@@ -30,6 +34,7 @@ router.get('/ofCustomer/:customer_id', async (request, response) => {
 
 router.post('/', async (request, response) => {
   const itemsOfOrder = request.body
+  if (!validate.ordersPOST(itemsOfOrder)) return response.status(400).send()
 
   let totalPriceOfOrder = 0
 
@@ -70,6 +75,7 @@ router.post('/', async (request, response) => {
 
 router.put('/internalNotes', async (request, response) => {
   const orderToModify = request.body
+  if (!validate.ordersPUTinternalNotes(orderToModify)) return response.status(400).send()
 
   const text = 'UPDATE public.Order SET internalNotes = $1 WHERE id = $2 RETURNING id'
   const values = [orderToModify.internalNotes, orderToModify.id]
@@ -79,6 +85,7 @@ router.put('/internalNotes', async (request, response) => {
 
 router.put('/orderDispatced', async (request, response) => {
   const orderToModify = request.body
+  if (!validate.ordersPUTorderDispatced(orderToModify)) return response.status(400).send()
 
   const text = 'UPDATE public.Order SET orderDispatched = CURRENT_TIMESTAMP WHERE id = $1 RETURNING id'
   const values = [orderToModify.id]

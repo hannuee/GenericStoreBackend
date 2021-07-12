@@ -1,5 +1,6 @@
 const router = require('express').Router()
 const database = require('../database')
+const validate = require('../validators')
 const bcrypt = require('bcrypt')
 
 router.get('/', async (request, response) => {
@@ -12,8 +13,11 @@ router.get('/', async (request, response) => {
   })
 
 router.get('/:email', async (request, response) => {
+  const customerToFind = { email: request.params.email}
+  if (!validate.customersGETwithEmail(customerToFind)) return response.status(400).send()
+
   try {
-    const results = await database.query('SELECT * FROM public.Customer WHERE email = $1', [request.params.email])
+    const results = await database.query('SELECT * FROM public.Customer WHERE email = $1', [customerToFind.email])
     response.json(results.rows)
   } catch (err) {
     response.json(err)
@@ -22,6 +26,7 @@ router.get('/:email', async (request, response) => {
 
 router.post('/', async (request, response) => {
   const customerToAdd = request.body
+  if (!validate.customersPOST(customerToAdd)) return response.status(400).send()
 
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(customerToAdd.password, saltRounds)

@@ -3,6 +3,7 @@ Content-Type: application/json
 
 
 {
-    "parentCategoryId": 1,
-    "name": "Sedans"
+    "parentCategoryId": null,
+    "name": "Coupe SUVs",
+    "description": null
 }

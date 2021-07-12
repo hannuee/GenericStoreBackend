@@ -3,6 +3,6 @@ Content-Type: application/json
 
 
 {
-    "id": 3,
-    "parentCategoryId": null
+    "id": 10,
+    "parentCategoryId": 1
 }
