@@ -54,22 +54,37 @@ router.post('/', async (request, response) => {
     });
     if(found === undefined) console.log('FAIL')
 
-    totalPriceOfOrder += item.priceAndSize.price
+    totalPriceOfOrder += item.priceAndSize.price * item.quantity
 
     if(item.quantity < 1) console.log('FAIL')  // Item's quantity must be 1 or more.
   }
 
-  // Add the Order to DB:
-  const orderInsertResult = await database.query('INSERT INTO public.Order(customer_id , purchasePrice) VALUES($1, $2) RETURNING id', [1, totalPriceOfOrder])
-  if(orderInsertResult.rows.length !== 1) console.log('FAILinsert')
-  order_id = orderInsertResult.rows[0].id
+  // Transaction setup:
+  const client = await database.transactionConnection()
+  if(client === undefined) console.log('FAIL')
+  try {
+    await client.query('BEGIN')
 
-  // Add the ProductOrders to DB:
-  for(let item of itemsOfOrder){
-    const text = 'INSERT INTO public.ProductOrder(product_id , order_id, priceAndSize, quantity ) VALUES($1, $2, $3, $4) RETURNING id'
-    const values = [item.product_id, order_id, item.priceAndSize, item.quantity]
-    const productOrderInsertResult = await database.query(text, values)
-    if(productOrderInsertResult.rows.length !== 1) console.log('FAILinsert')
+    // Add the Order to DB:
+    const orderInsertResult = await client.query('INSERT INTO public.Order(customer_id , purchasePrice) VALUES($1, $2) RETURNING id', [1, totalPriceOfOrder])
+    if(orderInsertResult.rows.length !== 1) console.log('FAILinsert')
+    order_id = orderInsertResult.rows[0].id
+
+    // Add the ProductOrders to DB:
+    for(let item of itemsOfOrder){
+      const text = 'INSERT INTO public.ProductOrder(product_id , order_id, priceAndSize, quantity ) VALUES($1, $2, $3, $4) RETURNING id'
+      const values = [item.product_id, order_id, item.priceAndSize, item.quantity]
+      const productOrderInsertResult = await client.query(text, values)
+      if(productOrderInsertResult.rows.length !== 1) console.log('FAILinsert')
+    }
+
+    // Transaction tear down:
+    await client.query('COMMIT')
+  } catch (e) {
+    await client.query('ROLLBACK')
+    console.log('FAIL')
+  } finally {
+    client.release()
   }
 })
 
