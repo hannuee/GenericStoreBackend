@@ -1,0 +1,7 @@
+POST http://localhost:3001/api/customers/login
+Content-Type: application/json
+
+{
+    "email": "jack@mi.ami",
+    "password": "Super Uber passu"
+}

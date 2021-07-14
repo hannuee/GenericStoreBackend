@@ -2,9 +2,9 @@ POST http://localhost:3001/api/customers
 Content-Type: application/json
 
 {
-    "name": "Veikko",
-    "address": "Vaasa",
+    "name": "Jack",
+    "address": "Miami",
     "mobile": "045 1234567",
-    "email": "veikko@suo.mi",
-    "password": "Tosi salainen"
+    "email": "jack@mi.ami",
+    "password": "Super Uber passu"
 }
