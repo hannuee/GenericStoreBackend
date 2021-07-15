@@ -7,9 +7,9 @@ router.get('/', async (request, response) => {
   try {
     results = await database.query('SELECT * FROM public.Category')
   } catch (error) {
-    response.status(500).json({ error: 'Database error'})
+    return response.status(500).json({ error: 'Database error'})
   }
-  response.json(results.rows)
+  return response.json(results.rows)
 })
 
 router.post('/', async (request, response) => {
@@ -19,23 +19,27 @@ router.post('/', async (request, response) => {
   let categoryInsertResult 
   try {
     categoryInsertResult = await database.query('INSERT INTO public.Category(category_id, name, description) VALUES($1, $2, $3) RETURNING id', [categoryToAdd.parentCategoryId, categoryToAdd.name, categoryToAdd.description])
+    if(categoryInsertResult.rows.length !== 1) throw 'error'
   } catch (error) {
-    response.status(500).json({ error: 'Database error'})
+    return response.status(500).json({ error: 'Database error'})
   }
-  if(categoryInsertResult.rows.length !== 1) console.log('FAILinsert')
+
+  return response.status(200).send()
 })
 
 router.delete('/:id', async (request, response) => {
   const categoryIdToDelete = { id: Number(request.params.id)}
   if (!validate.id(categoryIdToDelete)) return response.status(400).json({ error: 'Incorrect input'})
 
-  let result
+  let categoryDeletionResult
   try {
-    result = await database.query('DELETE FROM public.Category WHERE id = $1', [categoryIdToDelete.id])
-    console.log(result)
-  } catch (err) {
-    response.json(err)
+    categoryDeletionResult = await database.query('DELETE FROM public.Category WHERE id = $1 RETURNING id', [categoryIdToDelete.id])
+    if(categoryDeletionResult.rows.length !== 1) throw 'error'
+  } catch (error) {
+    return response.status(500).json({ error: 'Database error'})
   }
+
+  return response.status(200).send()
 })
 
 router.put('/newCategory', async (request, response) => {
@@ -47,10 +51,12 @@ router.put('/newCategory', async (request, response) => {
     const text = 'UPDATE public.Category SET category_id = $1 WHERE id = $2 RETURNING id'
     const values = [categoryToModify.parentCategoryId, categoryToModify.id]
     categoryModificationResult = await database.query(text, values)
+    if(categoryModificationResult.rows.length !== 1) throw 'error'
   } catch (error) {
-    response.status(500).json({ error: 'Database error'})
+    return response.status(500).json({ error: 'Database error'})
   }
-  if(categoryModificationResult.rows.length !== 1) console.log('FAILinsert')
+
+  return response.status(200).send()
 })
 
 module.exports = router
