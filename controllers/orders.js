@@ -66,17 +66,17 @@ router.post('/', async (request, response) => {
   // Loop to check that every item of the order is appropriate:
   for(let item of itemsOfOrder){
     // Try to get the product corresponding to the item from the database:
-    let productInArray
+    let queryResult
     try {
-      productInArray = await database.query('SELECT * FROM public.Product WHERE id = $1', [item.product_id])
+      queryResult = await database.query('SELECT * FROM public.Product WHERE id = $1', [item.product_id])
     } catch (error) {
       return response.status(500).json({ error: 'Database error'})
     }
 
     // Product ID is ok if DB yields 1 result.
-    if(productInArray.rows.length !== 1) return response.status(400).json({ error: 'Product not found from database'})
+    if(queryResult.rows.length !== 1) return response.status(400).json({ error: 'Product not found from database'})
 
-    const product = productInArray.rows[0]
+    const product = queryResult.rows[0]
 
     // Product must be available.
     if(!product.available) return response.status(400).json({ error: 'Product not available'})
