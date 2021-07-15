@@ -20,6 +20,27 @@ router.get('/undispatched', async (request, response) => {
     }
 })
 
+router.get('/undispatchedWithDetails', async (request, response) => {
+  try {
+      const columns = 
+      'public.Order.id, public.Order.customer_id, public.Order.orderReceived, public.Order.purchaseprice, ' +
+      'public.Order.customerinstructions, public.Order.internalnotes, ' +
+      'public.ProductOrder.priceAndSize, public.ProductOrder.quantity, ' +
+      'public.Product.name'
+      const joinCondition =  
+      'public.Order.id = public.ProductOrder.order_id AND public.ProductOrder.product_id = public.Product.id'
+      
+      const textMain = 
+      'SELECT ' + columns + ' FROM public.Order, public.ProductOrder, public.Product WHERE public.Order.orderDispatched IS NULL AND ' 
+      + joinCondition + ' ORDER BY public.Order.id ASC'
+
+      const results = await database.query(textMain)
+      response.json(results.rows)
+  } catch (err) {
+      response.json(err)
+  }
+})
+
 router.get('/ofCustomer/:customer_id', async (request, response) => {
   const customerIdToGetOrders = { id: Number(request.params.customer_id)}
   if (!validate.id(customerIdToGetOrders)) return response.status(400).send()
