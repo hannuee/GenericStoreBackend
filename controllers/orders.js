@@ -3,27 +3,27 @@ const database = require('../database')
 const validate = require('../validators')
 
 router.get('/', async (request, response) => {
-  let results  
+  let queryResult  
   try {
-      results = await database.query('SELECT * FROM public.Order')
+    queryResult = await database.query('SELECT * FROM public.Order')
     } catch (error) {
       return response.status(500).json({ error: 'Database error'})
     }
-  return response.json(results.rows)
+  return response.json(queryResult.rows)
 })
 
 router.get('/undispatched', async (request, response) => {
-  let results
+  let queryResult
   try {
-        results = await database.query('SELECT * FROM public.Order WHERE orderDispatched IS NULL')
+    queryResult = await database.query('SELECT * FROM public.Order WHERE orderDispatched IS NULL')
     } catch (error) {
       return response.status(500).json({ error: 'Database error'})
     }
-  return response.json(results.rows)
+  return response.json(queryResult.rows)
 })
 
 router.get('/undispatchedWithDetails', async (request, response) => {
-  let results
+  let queryResult
   try {
     const columns = 
       'public.Order.id, public.Order.customer_id, public.Order.orderReceived, public.Order.purchaseprice, ' +
@@ -37,24 +37,24 @@ router.get('/undispatchedWithDetails', async (request, response) => {
       'SELECT ' + columns + ' FROM public.Order, public.ProductOrder, public.Product WHERE public.Order.orderDispatched IS NULL AND ' 
       + joinCondition + ' ORDER BY public.Order.id ASC'
 
-    results = await database.query(textMain)
+      queryResult = await database.query(textMain)
   } catch (error) {
     return response.status(500).json({ error: 'Database error'})
   }
-  return response.json(results.rows)
+  return response.json(queryResult.rows)
 })
 
 router.get('/ofCustomer/:customer_id', async (request, response) => {
   const customerIdToGetOrders = { id: Number(request.params.customer_id)}
   if (!validate.id(customerIdToGetOrders)) return response.status(400).json({ error: 'Incorrect input'})
   
-  let results
+  let queryResult
   try {
-    results = await database.query('SELECT * FROM public.Order WHERE customer_id = $1', [customerIdToGetOrders.id])
+    queryResult = await database.query('SELECT * FROM public.Order WHERE customer_id = $1', [customerIdToGetOrders.id])
   } catch (error) {
     return response.status(500).json({ error: 'Database error'})
   }
-  return response.json(results.rows)
+  return response.json(queryResult.rows)
 })
 
 router.post('/', async (request, response) => {
@@ -126,12 +126,12 @@ router.put('/internalNotes', async (request, response) => {
   const orderToModify = request.body
   if (!validate.ordersPUTinternalNotes(orderToModify)) return response.status(400).json({ error: 'Incorrect input'})
 
-  let orderModificationResult
+  let queryResult
   try {
     const text = 'UPDATE public.Order SET internalNotes = $1 WHERE id = $2 RETURNING id'
     const values = [orderToModify.internalNotes, orderToModify.id]
-    orderModificationResult = await database.query(text, values)
-    if(orderModificationResult.rows.length !== 1) throw 'error'
+    queryResult = await database.query(text, values)
+    if(queryResult.rows.length !== 1) throw 'error'
   } catch (error) {
     return response.status(500).json({ error: 'Database error'})
   }
@@ -143,12 +143,12 @@ router.put('/orderDispatced', async (request, response) => {
   const orderToModify = request.body
   if (!validate.ordersPUTorderDispatced(orderToModify)) return response.status(400).json({ error: 'Incorrect input'})
 
-  let orderModificationResult
+  let queryResult
   try {
     const text = 'UPDATE public.Order SET orderDispatched = CURRENT_TIMESTAMP WHERE id = $1 RETURNING id'
     const values = [orderToModify.id]
-    orderModificationResult = await database.query(text, values)
-    if(orderModificationResult.rows.length !== 1) throw 'error'
+    queryResult = await database.query(text, values)
+    if(queryResult.rows.length !== 1) throw 'error'
   } catch (error) {
     return response.status(500).json({ error: 'Database error'})
   }
