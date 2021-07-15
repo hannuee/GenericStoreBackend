@@ -3,66 +3,75 @@ const database = require('../database')
 const validate = require('../validators')
 
 router.get('/', async (request, response) => {
-    try {
-      const results = await database.query('SELECT * FROM public.Order')
-      response.json(results.rows)
-    } catch (err) {
-      response.json(err)
+  let results  
+  try {
+      results = await database.query('SELECT * FROM public.Order')
+    } catch (error) {
+      response.status(500).json({ error: 'Database error'})
     }
+  response.json(results.rows)
 })
 
 router.get('/undispatched', async (request, response) => {
-    try {
-        const results = await database.query('SELECT * FROM public.Order WHERE orderDispatched IS NULL')
-        response.json(results.rows)
-    } catch (err) {
-        response.json(err)
+  let results
+  try {
+        results = await database.query('SELECT * FROM public.Order WHERE orderDispatched IS NULL')
+    } catch (error) {
+      response.status(500).json({ error: 'Database error'})
     }
+  response.json(results.rows)
 })
 
 router.get('/undispatchedWithDetails', async (request, response) => {
+  let results
   try {
-      const columns = 
+    const columns = 
       'public.Order.id, public.Order.customer_id, public.Order.orderReceived, public.Order.purchaseprice, ' +
       'public.Order.customerinstructions, public.Order.internalnotes, ' +
       'public.ProductOrder.priceAndSize, public.ProductOrder.quantity, ' +
       'public.Product.name'
-      const joinCondition =  
+    const joinCondition =  
       'public.Order.id = public.ProductOrder.order_id AND public.ProductOrder.product_id = public.Product.id'
       
-      const textMain = 
+    const textMain = 
       'SELECT ' + columns + ' FROM public.Order, public.ProductOrder, public.Product WHERE public.Order.orderDispatched IS NULL AND ' 
       + joinCondition + ' ORDER BY public.Order.id ASC'
 
-      const results = await database.query(textMain)
-      response.json(results.rows)
-  } catch (err) {
-      response.json(err)
+    results = await database.query(textMain)
+  } catch (error) {
+    response.status(500).json({ error: 'Database error'})
   }
+  response.json(results.rows)
 })
 
 router.get('/ofCustomer/:customer_id', async (request, response) => {
   const customerIdToGetOrders = { id: Number(request.params.customer_id)}
-  if (!validate.id(customerIdToGetOrders)) return response.status(400).send()
+  if (!validate.id(customerIdToGetOrders)) return response.status(400).json({ error: 'Incorrect input'})
   
+  let results
   try {
-    const results = await database.query('SELECT * FROM public.Order WHERE customer_id = $1', [customerIdToGetOrders.id])
-    response.json(results.rows)
-  } catch (err) {
-    response.json(err)
+    results = await database.query('SELECT * FROM public.Order WHERE customer_id = $1', [customerIdToGetOrders.id])
+  } catch (error) {
+    response.status(500).json({ error: 'Database error'})
   }
+  response.json(results.rows)
 })
 
 router.post('/', async (request, response) => {
   const itemsOfOrder = request.body
-  if (!validate.ordersPOST(itemsOfOrder)) return response.status(400).send()
+  if (!validate.ordersPOST(itemsOfOrder)) return response.status(400).json({ error: 'Incorrect input'})
 
   let totalPriceOfOrder = 0
 
   // Loop to check that every item of the order is appropriate:
   for(let item of itemsOfOrder){
     // Try to get the product corresponding to the item from the database:
-    const productInArray = await database.query('SELECT * FROM public.Product WHERE id = $1', [item.product_id])
+    let productInArray
+    try {
+      productInArray = await database.query('SELECT * FROM public.Product WHERE id = $1', [item.product_id])
+    } catch (error) {
+      response.status(500).json({ error: 'Database error'})
+    }
 
     if(productInArray.rows.length !== 1) console.log('FAILlen')  // Product ID is ok if DB yields 1 result.
 
@@ -111,21 +120,31 @@ router.post('/', async (request, response) => {
 
 router.put('/internalNotes', async (request, response) => {
   const orderToModify = request.body
-  if (!validate.ordersPUTinternalNotes(orderToModify)) return response.status(400).send()
+  if (!validate.ordersPUTinternalNotes(orderToModify)) return response.status(400).json({ error: 'Incorrect input'})
 
-  const text = 'UPDATE public.Order SET internalNotes = $1 WHERE id = $2 RETURNING id'
-  const values = [orderToModify.internalNotes, orderToModify.id]
-  const orderModificationResult = await database.query(text, values)
+  let orderModificationResult
+  try {
+    const text = 'UPDATE public.Order SET internalNotes = $1 WHERE id = $2 RETURNING id'
+    const values = [orderToModify.internalNotes, orderToModify.id]
+    orderModificationResult = await database.query(text, values)
+  } catch (error) {
+    response.status(500).json({ error: 'Database error'})
+  }
   if(orderModificationResult.rows.length !== 1) console.log('FAILinsert')
 })
 
 router.put('/orderDispatced', async (request, response) => {
   const orderToModify = request.body
-  if (!validate.ordersPUTorderDispatced(orderToModify)) return response.status(400).send()
+  if (!validate.ordersPUTorderDispatced(orderToModify)) return response.status(400).json({ error: 'Incorrect input'})
 
-  const text = 'UPDATE public.Order SET orderDispatched = CURRENT_TIMESTAMP WHERE id = $1 RETURNING id'
-  const values = [orderToModify.id]
-  const orderModificationResult = await database.query(text, values)
+  let orderModificationResult
+  try {
+    const text = 'UPDATE public.Order SET orderDispatched = CURRENT_TIMESTAMP WHERE id = $1 RETURNING id'
+    const values = [orderToModify.id]
+    orderModificationResult = await database.query(text, values)
+  } catch (error) {
+    response.status(500).json({ error: 'Database error'})
+  }
   if(orderModificationResult.rows.length !== 1) console.log('FAILinsert')
 })
 
