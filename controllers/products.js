@@ -10,7 +10,7 @@ router.get('/', async (request, response) => {
       return response.status(500).json({ error: 'Database error'})
     }
     return response.json(queryResult.rows)
-  })
+})
 
 router.get('/ofCategory/:id', async (request, response) => {
   const categoryIdToGetCategories = { id: Number(request.params.id)}
@@ -19,6 +19,19 @@ router.get('/ofCategory/:id', async (request, response) => {
   let queryResult
   try {
     queryResult = await database.query('SELECT * FROM public.Product WHERE category_id = $1', [categoryIdToGetCategories.id])
+  } catch (error) {
+    return response.status(500).json({ error: 'Database error'})
+  }
+  return response.json(queryResult.rows)
+})
+
+router.get('/availableOfCategory/:id', async (request, response) => {
+  const categoryIdToGetCategories = { id: Number(request.params.id)}
+  if (!validate.id(categoryIdToGetCategories)) return response.status(400).json({ error: 'Incorrect input'})
+
+  let queryResult
+  try {
+    queryResult = await database.query('SELECT * FROM public.Product WHERE available = TRUE AND category_id = $1', [categoryIdToGetCategories.id])
   } catch (error) {
     return response.status(500).json({ error: 'Database error'})
   }
