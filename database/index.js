@@ -5,7 +5,7 @@ const pool = new Pool({
     connectionString: config.DATABASE_URL
 })
 
-const clearDatabaseStatements = [
+const destructDatabaseStatements = [
   'DROP TABLE public.ProductOrder',
   'DROP TABLE public.Order',
   'DROP TABLE public.Customer',
@@ -58,9 +58,57 @@ const buildDatabaseStatements = [
 
 const testDataInsertStatements = [
   'INSERT INTO public.Category (name, description) VALUES (\'Nissan\', \'Cars made by Nissan.\')',
-  'INSERT INTO public.Category (name, category_id, description) VALUES (\'SUVs\', 1, \'SUVs made by Nissan.\')',
-  'INSERT INTO public.Category (name, description) VALUES (\'Toyota\', \'Cars made by Toyota.\')'
+  'INSERT INTO public.Category (name, description) VALUES (\'Toyota\', \'Cars made by Toyota.\')',
+  'INSERT INTO public.Category (name, category_id, description) VALUES (\'SUVs\', 2, \'SUVs made by Toyota.\')',
+
+  'INSERT INTO public.Product (category_id, name, description, pricesAndSizes, available)' +
+  'VALUES (1, \'Nissan Leaf\', \'An electric car.\', \'{ \"arr\": [{\"price\": 3800000, \"size": \"5 seater\"}] }\', TRUE)',
+  'INSERT INTO public.Product (category_id, name, description, pricesAndSizes, available)' +
+  'VALUES (1, \'Nissan Micra\', \'A small car.\', \'{ \"arr\": [{\"price\": 1800000, \"size": \"5 seater\"}] }\', FALSE)',
+  'INSERT INTO public.Product (category_id, name, description, pricesAndSizes, available)' +
+  'VALUES (3, \'Toyota Landcruiser\', \'An SUV.\', \'{ \"arr\": [{\"price\": 8000000, \"size": \"5 seater\"}, {\"price\": 12000000, \"size\": \"7 seater\"}] }\', TRUE)',
+
+  'INSERT INTO public.Customer (name, address, mobile, email, passwordHash)' +
+  'VALUES (\'Emma\', \'Finland\', \'050 1234567\', \'emma@suomi.fi\', \'emmansalasana\')',
+  'INSERT INTO public.Customer (name, address, mobile, email, passwordHash)' +
+  'VALUES (\'Matti\', \'Finland\', \'040 1234567\', \'matti@suomi.fi\', \'matinsalasana\')',
+
+  'INSERT INTO public.Order (customer_id, purchasePrice, customerInstructions)' +
+  'VALUES (1, 8000000, \'Toimitus iltapäivällä.\')',
+  'INSERT INTO public.Order (customer_id, purchasePrice, customerInstructions)' +
+  'VALUES (2, 15800000, \'Toimitus aamulla.\')',
+
+  'INSERT INTO public.ProductOrder (product_id, order_id, priceAndSize, quantity)' +
+  'VALUES (3, 1, \'{\"price\": 8000000, \"size\": \"5 seater\"}\', 1)',
+  'INSERT INTO public.ProductOrder (product_id, order_id, priceAndSize, quantity)' +
+  'VALUES (1, 2, \'{\"price\": 3800000, \"size\": \"5 seater\"}\', 2)',
+  'INSERT INTO public.ProductOrder (product_id, order_id, priceAndSize, quantity)' +
+  'VALUES (3, 2, \'{\"price\": 12000000, \"size\": \"7 seater\"}\', 1)'
 ]
+
+const initializeDatabaseWithTestData = async () => {
+  for(let statement of destructDatabaseStatements){
+      try {
+          await pool.query(statement)
+      } catch (error) {
+          console.log('Database error')
+      }
+  }
+  for(let statement of buildDatabaseStatements){
+      try {
+          await pool.query(statement)
+      } catch (error) {
+          console.log('Database error')
+      }
+  }
+  for(let statement of testDataInsertStatements){
+    try {
+        await pool.query(statement)
+    } catch (error) {
+        console.log('Database error')
+    }
+  }
+}
 
 module.exports = {
     async query(text, params) {
@@ -72,5 +120,6 @@ module.exports = {
     },
     async endPool() {
       await pool.end()
-    }
+    },
+    initializeDatabaseWithTestData
 }

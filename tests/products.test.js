@@ -4,8 +4,8 @@ const database = require('../database')
 
 const api = supertest(app)
 
-beforeAll(() => {
-    
+beforeAll(async () => {
+    await database.initializeDatabaseWithTestData()
 });
 
 test('products are returned as json', async () => {
@@ -15,7 +15,6 @@ test('products are returned as json', async () => {
     .expect('Content-Type', /application\/json/)
 
     expect(response.body).toHaveLength(3)
-    expect(response.body[2].name).toBe('BMW X6')
 })
 
 afterAll(async () => {
