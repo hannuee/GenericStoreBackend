@@ -75,6 +75,8 @@ test('ordersGETofCustomerWithDetails-endpoint returns all orders of a given cust
 
     const orderToInspect = response.body.find(order => order.customer_id === 1 && order.orderDetails.length === 1)
     expect(orderToInspect).toBeDefined()
+    // Should not have internalNotes:
+    expect(orderToInspect.internalnotes).toBeUndefined()
 })
 
 describe('ordersPOST-endpoint', () => {

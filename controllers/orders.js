@@ -142,7 +142,7 @@ router.get('/ofCustomerWithDetails/:customer_id', async (request, response) => {
   try {
     const columns = 
       'public.Order.id, public.Order.customer_id, public.Order.orderReceived, public.Order.purchaseprice, ' +
-      'public.Order.customerinstructions, public.Order.internalnotes, ' +
+      'public.Order.customerinstructions, ' +
       'public.ProductOrder.priceAndSize, public.ProductOrder.quantity, ' +
       'public.Product.name'
     const joinCondition =  
@@ -173,7 +173,6 @@ router.get('/ofCustomerWithDetails/:customer_id', async (request, response) => {
         orderreceived: row.orderreceived,
         purchaseprice: row.purchaseprice,
         customerinstructions: row.customerinstructions,
-        internalnotes: row.internalnotes,
         orderDetails: [{
           priceandsize: row.priceandsize,
           quantity: row.quantity,
