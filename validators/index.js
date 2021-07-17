@@ -1,8 +1,6 @@
 const Ajv = require("ajv")
 const ajv = new Ajv()
 
-console.log("PRE-COMPILEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
-
 const id = ajv.compile({
   type: "object",
   properties: {

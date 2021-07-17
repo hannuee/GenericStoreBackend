@@ -77,6 +77,8 @@ const testDataInsertStatements = [
   'VALUES (1, 8000000, \'Toimitus iltapäivällä.\')',
   'INSERT INTO public.Order (customer_id, purchasePrice, customerInstructions)' +
   'VALUES (2, 15800000, \'Toimitus aamulla.\')',
+  'INSERT INTO public.Order (customer_id, orderDispatched, purchasePrice, customerInstructions)' +
+  'VALUES (2, CURRENT_TIMESTAMP, 0, \'Tilaus joka on jo toimitettu.\')',
 
   'INSERT INTO public.ProductOrder (product_id, order_id, priceAndSize, quantity)' +
   'VALUES (3, 1, \'{\"price\": 8000000, \"size\": \"5 seater\"}\', 1)',

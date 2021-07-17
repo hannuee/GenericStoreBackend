@@ -35,13 +35,45 @@ router.get('/undispatchedWithDetails', async (request, response) => {
       
     const textMain = 
       'SELECT ' + columns + ' FROM public.Order, public.ProductOrder, public.Product WHERE public.Order.orderDispatched IS NULL AND ' 
-      + joinCondition + ' ORDER BY public.Order.id ASC'
+      + joinCondition
 
       queryResult = await database.query(textMain)
   } catch (error) {
     return response.status(500).json({ error: 'Database error'})
   }
-  return response.json(queryResult.rows)
+
+  let rowMap = new Map()
+  for(let row of queryResult.rows){
+    if(rowMap.has(row.id)) {
+      const rowFromMap = rowMap.get(row.id)
+      rowFromMap.orderDetails.push({
+        priceandsize: row.priceandsize,
+        quantity: row.quantity,
+        name: row.name
+      })
+    } else {
+      rowMap.set(row.id, {
+        id: row.id,
+        customer_id: row.customer_id,
+        orderreceived: row.orderreceived,
+        purchaseprice: row.purchaseprice,
+        customerinstructions: row.customerinstructions,
+        internalnotes: row.internalnotes,
+        orderDetails: [{
+          priceandsize: row.priceandsize,
+          quantity: row.quantity,
+          name: row.name
+        }]
+      })
+    }
+  }
+  
+  const formattedResult = []
+  for(let row of rowMap.values()){
+    formattedResult.push(row)
+  }
+
+  return response.json(formattedResult)
 })
 
 router.get('/ofCustomer/:customer_id', async (request, response) => {
