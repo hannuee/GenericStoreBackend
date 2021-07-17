@@ -8,6 +8,24 @@ beforeAll(async () => {
     await database.initializeDatabaseWithTestData()
 });
 
+test('ordersGETdetails-endpoint returns the order asked, with product details', async () => {
+    const response = await api
+    .get('/api/orders/details/2')
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+    const orderToInspect = response.body
+
+    expect(orderToInspect.id).toBe(2)
+    expect(orderToInspect.purchaseprice).toBe(19600000)
+    expect(orderToInspect.orderDetails).toHaveLength(2)
+
+    const productDetails1 = orderToInspect.orderDetails.find(detail => detail.quantity === 2 && detail.name === 'Nissan Leaf')
+    const productDetails2 = orderToInspect.orderDetails.find(detail => detail.quantity === 1 && detail.name === 'Toyota Landcruiser')
+    expect(productDetails1).toBeDefined()
+    expect(productDetails2).toBeDefined();
+})
+
 test('ordersGET-endpoint returns all orders', async () => {
     const response = await api
     .get('/api/orders')

@@ -2,6 +2,64 @@ const router = require('express').Router()
 const database = require('../database')
 const validate = require('../validators')
 
+router.get('/details/:id', async (request, response) => {
+  const orderIdInObject = { id: Number(request.params.id)}
+  if (!validate.id(orderIdInObject)) return response.status(400).json({ error: 'Incorrect input'})
+  const orderId = orderIdInObject.id
+
+  let queryResult
+  try {
+    const columns = 
+      'public.Order.id, public.Order.customer_id, public.Order.orderReceived, public.Order.purchaseprice, ' +
+      'public.Order.customerinstructions, public.Order.internalnotes, ' +
+      'public.ProductOrder.priceAndSize, public.ProductOrder.quantity, ' +
+      'public.Product.name'
+    const joinCondition =  
+      'public.Order.id = public.ProductOrder.order_id AND public.ProductOrder.product_id = public.Product.id'
+      
+    const textMain = 
+      'SELECT ' + columns + ' FROM public.Order, public.ProductOrder, public.Product WHERE public.Order.id = $1 AND ' 
+      + joinCondition
+
+      queryResult = await database.query(textMain, [orderId])
+  } catch (error) {
+    return response.status(500).json({ error: 'Database error'})
+  }
+
+  let rowMap = new Map()
+  for(let row of queryResult.rows){
+    if(rowMap.has(row.id)) {
+      const rowFromMap = rowMap.get(row.id)
+      rowFromMap.orderDetails.push({
+        priceandsize: row.priceandsize,
+        quantity: row.quantity,
+        name: row.name
+      })
+    } else {
+      rowMap.set(row.id, {
+        id: row.id,
+        customer_id: row.customer_id,
+        orderreceived: row.orderreceived,
+        purchaseprice: row.purchaseprice,
+        customerinstructions: row.customerinstructions,
+        internalnotes: row.internalnotes,
+        orderDetails: [{
+          priceandsize: row.priceandsize,
+          quantity: row.quantity,
+          name: row.name
+        }]
+      })
+    }
+  }
+  
+  const formattedResult = []
+  for(let row of rowMap.values()){
+    formattedResult.push(row)
+  }
+
+  return response.json(formattedResult[0])
+})
+
 router.get('/', async (request, response) => {
   let queryResult  
   try {
@@ -196,7 +254,7 @@ router.post('/', async (request, response) => {
     return response.status(500).json({ error: 'Database error'})
   }
   client.release()
-  
+
   return response.status(200).send()
 })
 
