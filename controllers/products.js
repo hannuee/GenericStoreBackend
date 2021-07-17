@@ -45,7 +45,7 @@ router.post('/', async (request, response) => {
   let queryResult
   try {
     const text = 'INSERT INTO public.Product(category_id, name, description, pricesAndSizes, available) VALUES($1, $2, $3, $4, $5) RETURNING id'
-    const values = [productToAdd.parentCategoryId, productToAdd.name, productToAdd.description, { arr: productToAdd.pricesAndSizes}, productToAdd.available]
+    const values = [productToAdd.parentCategoryId, productToAdd.name, productToAdd.description, JSON.stringify(productToAdd.pricesAndSizes), productToAdd.available]
     queryResult = await database.query(text, values)
     if(queryResult.rows.length !== 1) throw 'error'
   } catch (error) {
@@ -96,7 +96,7 @@ router.put('/pricesAndSizes', async (request, response) => {
   let queryResult
   try {
     const text = 'UPDATE public.Product SET pricesAndSizes = $1 WHERE id = $2 RETURNING id'
-    const values = [{ arr: productToModify.pricesAndSizes}, productToModify.id]
+    const values = [JSON.stringify(productToModify.pricesAndSizes), productToModify.id]
     queryResult = await database.query(text, values)
     if(queryResult.rows.length !== 1) throw 'error'
   } catch (error) {

@@ -35,7 +35,7 @@ test('ordersGETundispatchedWithDetails-endpoint returns all undispatched orders,
     .get('/api/orders/undispatchedWithDetails')
     .expect(200)
     .expect('Content-Type', /application\/json/)
-console.log(response.body)
+
     expect(response.body).toHaveLength(2)
 })
 

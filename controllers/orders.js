@@ -114,7 +114,7 @@ router.post('/', async (request, response) => {
     if(!product.available) return response.status(400).json({ error: 'Product not available'})
 
     // Item's priceAndSize details must match priceAndSize details in the DB.
-    const found = product.pricesandsizes.arr.find(element => {
+    const found = product.pricesandsizes.find(element => {
        return element.price === item.priceAndSize.price && element.size === item.priceAndSize.size
     });
     if(found === undefined) return response.status(400).json({ error: 'Product information incorrect'})

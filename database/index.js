@@ -62,11 +62,11 @@ const testDataInsertStatements = [
   'INSERT INTO public.Category (name, category_id, description) VALUES (\'SUVs\', 2, \'SUVs made by Toyota.\')',
 
   'INSERT INTO public.Product (category_id, name, description, pricesAndSizes, available)' +
-  'VALUES (1, \'Nissan Leaf\', \'An electric car.\', \'{ \"arr\": [{\"price\": 3800000, \"size": \"5 seater\"}] }\', TRUE)',
+  'VALUES (1, \'Nissan Leaf\', \'An electric car.\', \'[{\"price\": 3800000, \"size": \"5 seater\"}]\', TRUE)',
   'INSERT INTO public.Product (category_id, name, description, pricesAndSizes, available)' +
-  'VALUES (1, \'Nissan Micra\', \'A small car.\', \'{ \"arr\": [{\"price\": 1800000, \"size": \"5 seater\"}] }\', FALSE)',
+  'VALUES (1, \'Nissan Micra\', \'A small car.\', \'[{\"price\": 1800000, \"size": \"5 seater\"}]\', FALSE)',
   'INSERT INTO public.Product (category_id, name, description, pricesAndSizes, available)' +
-  'VALUES (3, \'Toyota Landcruiser\', \'An SUV.\', \'{ \"arr\": [{\"price\": 8000000, \"size": \"5 seater\"}, {\"price\": 12000000, \"size\": \"7 seater\"}] }\', TRUE)',
+  'VALUES (3, \'Toyota Landcruiser\', \'An SUV.\', \'[{\"price\": 8000000, \"size": \"5 seater\"}, {\"price\": 12000000, \"size\": \"7 seater\"}]\', TRUE)',
 
   'INSERT INTO public.Customer (name, address, mobile, email, passwordHash)' +
   'VALUES (\'Emma\', \'Finland\', \'050 1234567\', \'emma@suomi.fi\', \'emmansalasana\')',

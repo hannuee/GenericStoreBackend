@@ -122,7 +122,7 @@ test('productsPUTpricesAndSizes-endpoint modifies pricesAndSizes info of a produ
     .expect('Content-Type', /application\/json/)
 
     expect(response2.body).toHaveLength(2)
-    expect(response2.body.find(product => product.name === 'Nissan Leaf' && product.pricesandsizes.arr[0].price === 3500000))
+    expect(response2.body.find(product => product.name === 'Nissan Leaf' && product.pricesandsizes[0].price === 3500000))
     .toBeDefined()
 })
 
