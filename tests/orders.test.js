@@ -151,6 +151,50 @@ describe('ordersPOST-endpoint', () => {
     })
 })
 
+test('ordersPUTinternalNotes-endpoint modifies internalNotes of an order', async () => {
+    const newInternalNotes = {
+        "id": 2,
+        "internalNotes": "Varokaa vihaista lokkia asiakkaan pihalla!"
+    }
+    
+    const response = await api
+    .put('/api/orders/internalNotes')
+    .send(newInternalNotes)
+    .expect(200)
+
+    // Let's make another HTTP request to verify that the pervious one was succesful:
+    const response2 = await api
+    .get('/api/orders/details/2')
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+    const orderToInspect = response2.body
+    expect(orderToInspect.id).toBe(2)
+    expect(orderToInspect.internalnotes).toBe('Varokaa vihaista lokkia asiakkaan pihalla!')
+})
+
+test('ordersPUTorderDispatced-endpoint modifies orderDispatced of an order to current time', async () => {
+    const orderIdInObject = {
+        "id": 2
+    }
+    
+    const response = await api
+    .put('/api/orders/orderDispatced')
+    .send(orderIdInObject)
+    .expect(200)
+
+    // Let's make another HTTP request to verify that the pervious one was succesful:
+    const response2 = await api
+    .get('/api/orders/details/2')
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+    const orderToInspect = response2.body
+    expect(orderToInspect.id).toBe(2)
+    expect(orderToInspect.orderdispatched).toBeDefined()
+    expect(orderToInspect.orderdispatched).not.toBeNull()
+})
+
 
 afterAll(async () => {
     await database.endPool()

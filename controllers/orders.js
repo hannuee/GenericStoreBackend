@@ -10,7 +10,7 @@ router.get('/details/:id', async (request, response) => {
   let queryResult
   try {
     const columns = 
-      'public.Order.id, public.Order.customer_id, public.Order.orderReceived, public.Order.purchaseprice, ' +
+      'public.Order.id, public.Order.customer_id, public.Order.orderReceived, public.Order.orderDispatched, public.Order.purchaseprice, ' +
       'public.Order.customerinstructions, public.Order.internalnotes, ' +
       'public.ProductOrder.priceAndSize, public.ProductOrder.quantity, ' +
       'public.Product.name'
@@ -40,6 +40,7 @@ router.get('/details/:id', async (request, response) => {
         id: row.id,
         customer_id: row.customer_id,
         orderreceived: row.orderreceived,
+        orderdispatched: row.orderdispatched,
         purchaseprice: row.purchaseprice,
         customerinstructions: row.customerinstructions,
         internalnotes: row.internalnotes,
@@ -84,7 +85,7 @@ router.get('/undispatchedWithDetails', async (request, response) => {
   let queryResult
   try {
     const columns = 
-      'public.Order.id, public.Order.customer_id, public.Order.orderReceived, public.Order.purchaseprice, ' +
+      'public.Order.id, public.Order.customer_id, public.Order.orderReceived, public.Order.orderDispatched, public.Order.purchaseprice, ' +
       'public.Order.customerinstructions, public.Order.internalnotes, ' +
       'public.ProductOrder.priceAndSize, public.ProductOrder.quantity, ' +
       'public.Product.name'
@@ -114,6 +115,7 @@ router.get('/undispatchedWithDetails', async (request, response) => {
         id: row.id,
         customer_id: row.customer_id,
         orderreceived: row.orderreceived,
+        orderdispatched: row.orderdispatched,
         purchaseprice: row.purchaseprice,
         customerinstructions: row.customerinstructions,
         internalnotes: row.internalnotes,
@@ -141,7 +143,7 @@ router.get('/ofCustomerWithDetails/:customer_id', async (request, response) => {
   let queryResult
   try {
     const columns = 
-      'public.Order.id, public.Order.customer_id, public.Order.orderReceived, public.Order.purchaseprice, ' +
+      'public.Order.id, public.Order.customer_id, public.Order.orderReceived, public.Order.orderDispatched, public.Order.purchaseprice, ' +
       'public.Order.customerinstructions, ' +
       'public.ProductOrder.priceAndSize, public.ProductOrder.quantity, ' +
       'public.Product.name'
@@ -171,6 +173,7 @@ router.get('/ofCustomerWithDetails/:customer_id', async (request, response) => {
         id: row.id,
         customer_id: row.customer_id,
         orderreceived: row.orderreceived,
+        orderdispatched: row.orderdispatched,
         purchaseprice: row.purchaseprice,
         customerinstructions: row.customerinstructions,
         orderDetails: [{
@@ -280,7 +283,7 @@ router.put('/orderDispatced', async (request, response) => {
 
   let queryResult
   try {
-    const text = 'UPDATE public.Order SET orderDispatched = CURRENT_TIMESTAMP WHERE id = $1 RETURNING id'
+    const text = 'UPDATE public.Order SET orderDispatched = CURRENT_TIMESTAMP WHERE id = $1 AND orderDispatched IS NULL RETURNING id'
     const values = [orderToModify.id]
     queryResult = await database.query(text, values)
     if(queryResult.rows.length !== 1) throw 'error'
