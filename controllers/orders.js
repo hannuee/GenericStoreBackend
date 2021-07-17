@@ -196,6 +196,8 @@ router.post('/', async (request, response) => {
     return response.status(500).json({ error: 'Database error'})
   }
   client.release()
+  
+  return response.status(200).send()
 })
 
 router.put('/internalNotes', async (request, response) => {

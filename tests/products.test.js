@@ -52,7 +52,7 @@ test('productsPOST-endpoint adds new product succesfully', async () => {
     .send(newCar)
     .expect(200)
 
-
+    // Let's make another HTTP request to verify that the pervious one was succesful:
     const response2 = await api
     .get('/api/products/ofCategory/2')
     .expect(200)
@@ -73,7 +73,7 @@ test('productsPUTavailable-endpoint modifies availability status of a product', 
     .send(newStatus)
     .expect(200)
 
-
+    // Let's make another HTTP request to verify that the pervious one was succesful:
     const response2 = await api
     .get('/api/products/availableOfCategory/1')
     .expect(200)
@@ -94,7 +94,7 @@ test('productsPUTnewCategory-endpoint modifies parent category of a product', as
     .send(newCategory)
     .expect(200)
 
-
+    // Let's make another HTTP request to verify that the pervious one was succesful:
     const response2 = await api
     .get('/api/products/OfCategory/2')
     .expect(200)
@@ -115,7 +115,7 @@ test('productsPUTpricesAndSizes-endpoint modifies pricesAndSizes info of a produ
     .send(newPricesAndSizes)
     .expect(200)
 
-
+    // Let's make another HTTP request to verify that the pervious one was succesful:
     const response2 = await api
     .get('/api/products/OfCategory/1')
     .expect(200)

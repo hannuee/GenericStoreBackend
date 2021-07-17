@@ -59,6 +59,79 @@ test('ordersGETofCustomerWithDetails-endpoint returns all orders of a given cust
     expect(orderToInspect).toBeDefined()
 })
 
+describe('ordersPOST-endpoint', () => {
+
+    test('adds new order succesfully, with 2 items, of which anotherone has quantity 2', async () => {
+        const newOrder = 
+            [
+                {
+                    "product_id": 1,
+                    "priceAndSize": {"price": 3800000, "size": "5 seater"},
+                    "quantity": 2
+                },
+                {
+                    "product_id": 3,
+                    "priceAndSize": {"price": 12000000, "size": "7 seater"},
+                    "quantity": 1
+                }
+            ]
+        
+        const response = await api
+        .post('/api/orders/')
+        .send(newOrder)
+        .expect(200)
+
+        // Let's make another HTTP request to verify that the pervious one was succesful:
+        const response2 = await api
+        .get('/api/orders/ofCustomerWithDetails/1')
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+        expect(response2.body).toHaveLength(2)
+
+        const orderToInspect = response2.body.find(order => order.id === 4 && order.orderDetails.length === 2)
+        expect(orderToInspect).toBeDefined();
+        expect(orderToInspect.purchaseprice).toBe(2*3800000 + 12000000)
+
+        const productDetails1 = orderToInspect.orderDetails.find(detail => detail.quantity === 2 && detail.name === 'Nissan Leaf')
+        const productDetails2 = orderToInspect.orderDetails.find(detail => detail.quantity === 1 && detail.name === 'Toyota Landcruiser')
+        expect(productDetails1).toBeDefined()
+        expect(productDetails2).toBeDefined()
+    })
+
+    test('adds new order succesfully, with 1 item', async () => {
+        const newOrder = 
+            [
+                {
+                    "product_id": 1,
+                    "priceAndSize": {"price": 3800000, "size": "5 seater"},
+                    "quantity": 1
+                }
+            ]
+        
+        const response = await api
+        .post('/api/orders/')
+        .send(newOrder)
+        .expect(200)
+
+        // Let's make another HTTP request to verify that the pervious one was succesful:
+        const response2 = await api
+        .get('/api/orders/ofCustomerWithDetails/1')
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+        expect(response2.body).toHaveLength(3)
+
+        const orderToInspect = response2.body.find(order => order.id === 5 && order.orderDetails.length === 1)
+        expect(orderToInspect).toBeDefined();
+        expect(orderToInspect.purchaseprice).toBe(3800000)
+
+        expect(orderToInspect.orderDetails[0].quantity).toBe(1)
+        expect(orderToInspect.orderDetails[0].name).toBe('Nissan Leaf')
+    })
+})
+
+
 afterAll(async () => {
     await database.endPool()
 })
