@@ -89,20 +89,32 @@ const testDataInsertStatements = [
 ]
 
 const clearDatabaseIfNotEmpty = async () => {
-  //const countResult = await pool.query('SELECT count(*) FROM pg_stat_user_tables WHERE schemaname = \'public\'')
-  //if(countResult.rows[0].count === 0) return
+  const countResult = await pool.query('SELECT count(*) FROM pg_stat_user_tables WHERE schemaname = \'public\'')
+  if(countResult.rows[0].count === 0) return
 
   for(let statement of destructDatabaseStatements){
-    await pool.query(statement)
+    try {
+      await pool.query(statement)
+    } catch (error) {
+      return response.status(500).json({ error: 'Database error'})
+    }
   }
 }
 
 const initializeDatabaseWithTestData = async () => {
   for(let statement of buildDatabaseStatements){
-    await pool.query(statement)
+    try {
+      await pool.query(statement)
+    } catch (error) {
+      return response.status(500).json({ error: 'Database error'})
+    }
   }
   for(let statement of testDataInsertStatements){
-    await pool.query(statement)
+    try {
+      await pool.query(statement)
+    } catch (error) {
+      return response.status(500).json({ error: 'Database error'})
+    }
   }
 }
 
