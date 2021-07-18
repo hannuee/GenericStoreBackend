@@ -88,7 +88,7 @@ const testDataInsertStatements = [
   'VALUES (3, 2, \'{\"price\": 12000000, \"size\": \"7 seater\"}\', 1)'
 ]
 
-const initializeDatabaseWithTestData = async () => {
+const clearDatabase = async () => {
   for(let statement of destructDatabaseStatements){
       try {
           await pool.query(statement)
@@ -96,6 +96,9 @@ const initializeDatabaseWithTestData = async () => {
           console.log('Database error')
       }
   }
+}
+
+const initializeDatabaseWithTestData = async () => {
   for(let statement of buildDatabaseStatements){
       try {
           await pool.query(statement)
@@ -123,5 +126,6 @@ module.exports = {
     async endPool() {
       await pool.end()
     },
+    clearDatabase,
     initializeDatabaseWithTestData
 }

@@ -1,10 +1,12 @@
 const supertest = require('supertest')
 const app = require('../app')
 const database = require('../database')
+const config = require('../utils/config')
 
 const api = supertest(app)
 
 beforeAll(async () => {
+    if(config.TESTING_DB_NOT_EMPTY) await database.clearDatabase()
     await database.initializeDatabaseWithTestData()
 });
 
