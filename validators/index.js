@@ -54,15 +54,6 @@ const customersPOSTlogin = ajv.compile({
   additionalProperties: false
 })
 
-const customersGETwithEmail = ajv.compile({
-  type: "object",
-  properties: {
-      email: {type: "string", minLength: 5}
-  },
-  required: ["email"],
-  additionalProperties: false
-})
-
 const ordersPOST = ajv.compile({
   type: "array", minItems: 1, items: {
     type: "object",
@@ -164,6 +155,6 @@ const productsPUTpricesAndSizes = ajv.compile({
 })
 
 module.exports = {id, categoriesPOST, categoriesPUTnewCategory, customersPOST, 
-  customersGETwithEmail, ordersPUTinternalNotes, ordersPUTorderDispatced, 
+  ordersPUTinternalNotes, ordersPUTorderDispatced, 
   productsPUTavailable, productsPUTnewCategory, productsPUTpricesAndSizes,
   productsPOST, ordersPOST, customersPOSTlogin}

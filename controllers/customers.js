@@ -8,24 +8,25 @@ const jwt = require('jsonwebtoken')
 router.get('/', async (request, response) => {
   let queryResult  
   try {
-    queryResult = await database.query('SELECT * FROM public.Customer')
+    queryResult = await database.query('SELECT id, name FROM public.Customer')
     } catch (error) {
       return response.status(500).json({ error: 'Database error'})
     }
   return response.json(queryResult.rows)
 })
 
-router.get('/:email', async (request, response) => {
-  const customerToFind = { email: request.params.email}
-  if (!validate.customersGETwithEmail(customerToFind)) return response.status(400).json({ error: 'Incorrect input'})
+router.get('/:id', async (request, response) => {
+  const customerIdInObject = { id: Number(request.params.id)}
+  if (!validate.id(customerIdInObject)) return response.status(400).json({ error: 'Incorrect input'})
+  const customerId = customerIdInObject.id
 
   let queryResult
   try {
-    queryResult = await database.query('SELECT * FROM public.Customer WHERE email = $1', [customerToFind.email])
-  } catch (err) {
-    return response.json(err)
+    queryResult = await database.query('SELECT id, name, address, mobile, email FROM public.Customer WHERE id = $1', [customerId])
+  } catch (error) {
+    return response.status(500).json({ error: 'Database error'})
   }
-  return response.json(queryResult.rows)
+  return response.json(queryResult.rows[0])
 })
 
 // Add new user
