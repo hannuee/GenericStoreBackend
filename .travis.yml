@@ -12,5 +12,4 @@ before_script:
 
 env:
   - DATABASE_URL="postgres://foo:bar@localhost:5432/travisdb"
-
-  
+  - SECRET=CyFjx6hEq34oycJanNdqsPzaGL7Y7K  # This key is used for testing only
