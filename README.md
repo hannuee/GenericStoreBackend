@@ -6,3 +6,15 @@
 ## Backendin dokumentaatio
 * [Tietosisältökaavio](https://github.com/hannuee/GenericStoreBackend/blob/main/documentation/DatabaseDiagram.jpg)
 * [Tietokantataulujen luontilauseet](https://github.com/hannuee/GenericStoreBackend/blob/main/documentation/CreateTables.txt)
+
+## Backendissa käytetyt teknologiat, frameworkit ja palvelut
+| Aihe | Toteutus |
+| --- | --- |
+| Versionhallinta | Git |
+| Versionhallinta-palvelin | GitHub |
+| Paketinhallinta | npm |
+| Web framework | Express |
+| Ohjelmointikieli | JavaScript (Node.js) |
+| Tietokanta | PostgreSQL |
+| CI-palvelu | Travis CI |
+| PaaS-palvelu | Heroku |
