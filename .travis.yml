@@ -12,3 +12,5 @@ before_script:
 
 env:
   - DATABASE_URL="postgres://foo:bar@localhost:5432/travisdb"
+
+  
