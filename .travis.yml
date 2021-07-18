@@ -11,6 +11,5 @@ before_script:
   - psql -c "CREATE ROLE foo LOGIN SUPERUSER PASSWORD 'bar';" -U postgres
 
 env:
-  - DATABASE_URL="postgres://foo:bar@localhost:5432/travisdb"
-  - SECRET=CyFjx6hEq34oycJanNdqsPzaGL7Y7K  # This key is used for testing only
+  - DATABASE_URL=postgres://foo:bar@localhost:5432/travisdb SECRET=CyFjx6hEq34oycJanNdqsPzaGL7Y7K  # Both used for testing only
 
