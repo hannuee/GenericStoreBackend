@@ -91,12 +91,7 @@ const testDataInsertStatements = [
 
 const clearDatabaseIfNotEmpty = async () => {
   const countResult = await pool.query('SELECT count(*) FROM pg_stat_user_tables WHERE schemaname = \'public\'')
-  console.log(countResult.rows[0].count)
-  if(countResult.rows[0].count == 0) {
-    console.log('WINNNNNNNNNNNNNN')
-    console.log(typeof countResult.rows[0].count)
-    return
-  }
+  if(countResult.rows[0].count == 0) return
 
   for(let statement of destructDatabaseStatements){
     try {
