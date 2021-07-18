@@ -40,11 +40,11 @@ test('productsGETavailableOfCategory-endpoint returns all available products of 
 
 test('productsPOST-endpoint adds new product succesfully', async () => {
     const newCar = {
-        "parentCategoryId": 2,
-        "name": "Toyota Yaris GR",
-        "description": "Small sports car",
-        "pricesAndSizes": [ { "price": 4800000, "size": "" } ],
-        "available": true
+        parentCategoryId: 2,
+        name: "Toyota Yaris GR",
+        description: "Small sports car",
+        pricesAndSizes: [ { price: 4800000, size: "" } ],
+        available: true
     }
     
     const response = await api
@@ -64,8 +64,8 @@ test('productsPOST-endpoint adds new product succesfully', async () => {
 
 test('productsPUTavailable-endpoint modifies availability status of a product', async () => {
     const newStatus = {
-        "id": 2,
-        "available": true
+        id: 2,
+        available: true
     }
     
     const response = await api
@@ -85,8 +85,8 @@ test('productsPUTavailable-endpoint modifies availability status of a product', 
 
 test('productsPUTnewCategory-endpoint modifies parent category of a product', async () => {
     const newCategory = {
-        "id": 3,
-        "parentCategoryId": 2
+        id: 3,
+        parentCategoryId: 2
     }
     
     const response = await api
@@ -106,8 +106,8 @@ test('productsPUTnewCategory-endpoint modifies parent category of a product', as
 
 test('productsPUTpricesAndSizes-endpoint modifies pricesAndSizes info of a product', async () => {
     const newPricesAndSizes = {
-        "id": 1,
-        "pricesAndSizes": [ { "price": 3500000, "size": "5 seater" } ]
+        id: 1,
+        pricesAndSizes: [ { price: 3500000, size: "5 seater" } ]
     }
     
     const response = await api

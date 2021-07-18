@@ -85,14 +85,14 @@ describe('ordersPOST-endpoint', () => {
         const newOrder = 
             [
                 {
-                    "product_id": 1,
-                    "priceAndSize": {"price": 3800000, "size": "5 seater"},
-                    "quantity": 2
+                    product_id: 1,
+                    priceAndSize: {price: 3800000, size: "5 seater"},
+                    quantity: 2
                 },
                 {
-                    "product_id": 3,
-                    "priceAndSize": {"price": 12000000, "size": "7 seater"},
-                    "quantity": 1
+                    product_id: 3,
+                    priceAndSize: {price: 12000000, size: "7 seater"},
+                    quantity: 1
                 }
             ]
         
@@ -123,9 +123,9 @@ describe('ordersPOST-endpoint', () => {
         const newOrder = 
             [
                 {
-                    "product_id": 1,
-                    "priceAndSize": {"price": 3800000, "size": "5 seater"},
-                    "quantity": 1
+                    product_id: 1,
+                    priceAndSize: {price: 3800000, size: "5 seater"},
+                    quantity: 1
                 }
             ]
         
@@ -153,8 +153,8 @@ describe('ordersPOST-endpoint', () => {
 
 test('ordersPUTinternalNotes-endpoint modifies internalNotes of an order', async () => {
     const newInternalNotes = {
-        "id": 2,
-        "internalNotes": "Varokaa vihaista lokkia asiakkaan pihalla!"
+        id: 2,
+        internalNotes: "Varokaa vihaista lokkia asiakkaan pihalla!"
     }
     
     const response = await api
@@ -175,7 +175,7 @@ test('ordersPUTinternalNotes-endpoint modifies internalNotes of an order', async
 
 test('ordersPUTorderDispatced-endpoint modifies orderDispatced of an order to current time', async () => {
     const orderIdInObject = {
-        "id": 2
+        id: 2
     }
     
     const response = await api
