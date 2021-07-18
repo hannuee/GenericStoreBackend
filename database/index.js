@@ -98,7 +98,7 @@ const clearDatabaseIfNotEmpty = async () => {
     try {
       await pool.query(statement)
     } catch (error) {
-      return response.status(500).json({ error: 'Database error'})
+      console.log(error)
     }
   }
 }
@@ -108,14 +108,14 @@ const initializeDatabaseWithTestData = async () => {
     try {
       await pool.query(statement)
     } catch (error) {
-      return response.status(500).json({ error: 'Database error'})
+      console.log(error)
     }
   }
   for(let statement of testDataInsertStatements){
     try {
       await pool.query(statement)
     } catch (error) {
-      return response.status(500).json({ error: 'Database error'})
+      console.log(error)
     }
   }
 }
