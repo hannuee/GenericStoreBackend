@@ -88,30 +88,21 @@ const testDataInsertStatements = [
   'VALUES (3, 2, \'{\"price\": 12000000, \"size\": \"7 seater\"}\', 1)'
 ]
 
-const clearDatabase = async () => {
+const clearDatabaseIfNotEmpty = async () => {
+  const countResult = await pool.query('SELECT count(*) FROM pg_stat_user_tables WHERE schemaname = \'public\'')
+  if(countResult.rows[0].count === 0) return
+
   for(let statement of destructDatabaseStatements){
-      try {
-          await pool.query(statement)
-      } catch (error) {
-          console.log('Database error')
-      }
+    await pool.query(statement)
   }
 }
 
 const initializeDatabaseWithTestData = async () => {
   for(let statement of buildDatabaseStatements){
-      try {
-          await pool.query(statement)
-      } catch (error) {
-          console.log('Database error')
-      }
+    await pool.query(statement)
   }
   for(let statement of testDataInsertStatements){
-    try {
-        await pool.query(statement)
-    } catch (error) {
-        console.log('Database error')
-    }
+    await pool.query(statement)
   }
 }
 
@@ -126,6 +117,6 @@ module.exports = {
     async endPool() {
       await pool.end()
     },
-    clearDatabase,
+    clearDatabaseIfNotEmpty,
     initializeDatabaseWithTestData
 }
