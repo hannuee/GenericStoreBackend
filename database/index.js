@@ -1,9 +1,11 @@
 const config = require('../utils/config')
 const { Pool } = require('pg')
 
+console.log(config.DATABASE_URL)
 const pool = new Pool({
     connectionString: config.DATABASE_URL
 })
+console.log(pool)
 
 const destructDatabaseStatements = [
   'DROP TABLE public.ProductOrder',
