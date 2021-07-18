@@ -23,6 +23,7 @@ router.get('/:id', async (request, response) => {
   let queryResult
   try {
     queryResult = await database.query('SELECT id, name, address, mobile, email FROM public.Customer WHERE id = $1', [customerId])
+    if(queryResult.rows.length !== 1) throw 'error'
   } catch (error) {
     return response.status(500).json({ error: 'Database error'})
   }

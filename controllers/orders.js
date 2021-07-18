@@ -22,6 +22,7 @@ router.get('/details/:id', async (request, response) => {
       + joinCondition
 
       queryResult = await database.query(textMain, [orderId])
+      if(queryResult.rows.length >= 1) throw 'error'
   } catch (error) {
     return response.status(500).json({ error: 'Database error'})
   }
