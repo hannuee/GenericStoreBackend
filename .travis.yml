@@ -1,0 +1,14 @@
+language: node_js
+
+node_js:
+  - 14
+
+services:
+  - postgresql
+
+before_script:
+  - psql -c "CREATE DATABASE travisdb;" -U postgres
+  - psql -c "CREATE ROLE foo LOGIN SUPERUSER PASSWORD 'bar';" -U postgres
+
+env:
+  - DATABASE_URL="postgres://foo:bar@localhost:5432/travisdb"
