@@ -1,11 +1,10 @@
 const config = require('../utils/config')
 const { Pool } = require('pg')
+const e = require('express')
 
-console.log(config.DATABASE_URL)
 const pool = new Pool({
     connectionString: config.DATABASE_URL
 })
-console.log(pool)
 
 const destructDatabaseStatements = [
   'DROP TABLE public.ProductOrder',
@@ -92,13 +91,14 @@ const testDataInsertStatements = [
 
 const clearDatabaseIfNotEmpty = async () => {
   const countResult = await pool.query('SELECT count(*) FROM pg_stat_user_tables WHERE schemaname = \'public\'')
+  console.log(countResult.rows[0].count)
   if(countResult.rows[0].count === 0) return
 
   for(let statement of destructDatabaseStatements){
     try {
       await pool.query(statement)
     } catch (error) {
-      console.log(error)
+      console.log('error')
     }
   }
 }
@@ -108,14 +108,14 @@ const initializeDatabaseWithTestData = async () => {
     try {
       await pool.query(statement)
     } catch (error) {
-      console.log(error)
+      console.log('error')
     }
   }
   for(let statement of testDataInsertStatements){
     try {
       await pool.query(statement)
     } catch (error) {
-      console.log(error)
+      console.log('error')
     }
   }
 }
