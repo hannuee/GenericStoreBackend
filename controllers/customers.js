@@ -1,7 +1,7 @@
 require('dotenv').config()
 const router = require('express').Router()
 const database = require('../database')
-const validate = require('../validators')
+const {validateRequestParameterID, validateRequestBody} = require('../validators')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
@@ -15,10 +15,8 @@ router.get('/', async (request, response) => {
   return response.json(queryResult.rows)
 })
 
-router.get('/:id', async (request, response) => {
-  const customerIdInObject = { id: Number(request.params.id)}
-  if (!validate.id(customerIdInObject)) return response.status(400).json({ error: 'Incorrect input'})
-  const customerId = customerIdInObject.id
+router.get('/:id', validateRequestParameterID, async (request, response) => {
+  const customerId = Number(request.params.id)
 
   let queryResult
   try {
@@ -31,9 +29,8 @@ router.get('/:id', async (request, response) => {
 })
 
 // Add new user
-router.post('/', async (request, response) => {
+router.post('/', validateRequestBody, async (request, response) => {
   const customerToAdd = request.body
-  if (!validate.customersPOST(customerToAdd)) return response.status(400).json({ error: 'Incorrect input'})
 
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(customerToAdd.password, saltRounds)
@@ -52,9 +49,8 @@ router.post('/', async (request, response) => {
 })
 
 // Login
-router.post('/login', async (request, response) => {
+router.post('/login', validateRequestBody, async (request, response) => {
   const customerToLogin = request.body
-  if (!validate.customersPOSTlogin(customerToLogin)) return response.status(400).json({ error: 'Incorrect input'})
 
   let queryResult
   try {

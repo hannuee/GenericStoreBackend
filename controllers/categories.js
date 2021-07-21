@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const database = require('../database')
-const validate = require('../validators')
+const {validateRequestParameterID, validateRequestBody} = require('../validators')
 
 router.get('/', async (request, response) => {
   let queryResult
@@ -12,9 +12,8 @@ router.get('/', async (request, response) => {
   return response.json(queryResult.rows)
 })
 
-router.post('/', async (request, response) => {
+router.post('/', validateRequestBody, async (request, response) => {
   const categoryToAdd = request.body
-  if (!validate.categoriesPOST(categoryToAdd)) return response.status(400).json({ error: 'Incorrect input'})
 
   let queryResult 
   try {
@@ -27,9 +26,8 @@ router.post('/', async (request, response) => {
   return response.status(200).send()
 })
 
-router.delete('/:id', async (request, response) => {
+router.delete('/:id', validateRequestParameterID, async (request, response) => {
   const categoryIdToDelete = { id: Number(request.params.id)}
-  if (!validate.id(categoryIdToDelete)) return response.status(400).json({ error: 'Incorrect input'})
 
   let queryResult
   try {
@@ -42,9 +40,8 @@ router.delete('/:id', async (request, response) => {
   return response.status(200).send()
 })
 
-router.put('/newCategory', async (request, response) => {
+router.put('/newCategory', validateRequestBody, async (request, response) => {
   const categoryToModify = request.body
-  if (!validate.categoriesPUTnewCategory(categoryToModify)) return response.status(400).json({ error: 'Incorrect input'})
 
   let queryResult
   try {

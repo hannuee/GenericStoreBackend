@@ -1,11 +1,9 @@
 const router = require('express').Router()
 const database = require('../database')
-const validate = require('../validators')
+const {validateRequestParameterID, validateRequestBody} = require('../validators')
 
-router.get('/details/:id', async (request, response) => {
-  const orderIdInObject = { id: Number(request.params.id)}
-  if (!validate.id(orderIdInObject)) return response.status(400).json({ error: 'Incorrect input'})
-  const orderId = orderIdInObject.id
+router.get('/details/:id', validateRequestParameterID, async (request, response) => {
+  const orderId = Number(request.params.id)
 
   let queryResult
   try {
@@ -137,9 +135,8 @@ router.get('/undispatchedWithDetails', async (request, response) => {
   return response.json(formattedResult)
 })
 
-router.get('/ofCustomerWithDetails/:customer_id', async (request, response) => {
-  const customerIdToGetOrders = { id: Number(request.params.customer_id)}
-  if (!validate.id(customerIdToGetOrders)) return response.status(400).json({ error: 'Incorrect input'})
+router.get('/ofCustomerWithDetails/:id', validateRequestParameterID, async (request, response) => {
+  const customerIdToGetOrders = { id: Number(request.params.id)}
   
   let queryResult
   try {
@@ -194,9 +191,8 @@ router.get('/ofCustomerWithDetails/:customer_id', async (request, response) => {
   return response.json(formattedResult)
 })
 
-router.post('/', async (request, response) => {
+router.post('/', validateRequestBody, async (request, response) => {
   const itemsOfOrder = request.body
-  if (!validate.ordersPOST(itemsOfOrder)) return response.status(400).json({ error: 'Incorrect input'})
 
   let totalPriceOfOrder = 0
 
@@ -261,9 +257,8 @@ router.post('/', async (request, response) => {
   return response.status(200).send()
 })
 
-router.put('/internalNotes', async (request, response) => {
+router.put('/internalNotes', validateRequestBody, async (request, response) => {
   const orderToModify = request.body
-  if (!validate.ordersPUTinternalNotes(orderToModify)) return response.status(400).json({ error: 'Incorrect input'})
 
   let queryResult
   try {
@@ -278,9 +273,8 @@ router.put('/internalNotes', async (request, response) => {
   return response.status(200).send()
 })
 
-router.put('/orderDispatced', async (request, response) => {
+router.put('/orderDispatced', validateRequestBody, async (request, response) => {
   const orderToModify = request.body
-  if (!validate.ordersPUTorderDispatced(orderToModify)) return response.status(400).json({ error: 'Incorrect input'})
 
   let queryResult
   try {

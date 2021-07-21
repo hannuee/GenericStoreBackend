@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const database = require('../database')
-const validate = require('../validators')
+const {validateRequestParameterID, validateRequestBody} = require('../validators')
 
 router.get('/', async (request, response) => {
   let queryResult  
@@ -12,9 +12,8 @@ router.get('/', async (request, response) => {
     return response.json(queryResult.rows)
 })
 
-router.get('/ofCategory/:id', async (request, response) => {
+router.get('/ofCategory/:id', validateRequestParameterID, async (request, response) => {
   const categoryIdToGetCategories = { id: Number(request.params.id)}
-  if (!validate.id(categoryIdToGetCategories)) return response.status(400).json({ error: 'Incorrect input'})
 
   let queryResult
   try {
@@ -25,9 +24,8 @@ router.get('/ofCategory/:id', async (request, response) => {
   return response.json(queryResult.rows)
 })
 
-router.get('/availableOfCategory/:id', async (request, response) => {
+router.get('/availableOfCategory/:id', validateRequestParameterID, async (request, response) => {
   const categoryIdToGetCategories = { id: Number(request.params.id)}
-  if (!validate.id(categoryIdToGetCategories)) return response.status(400).json({ error: 'Incorrect input'})
 
   let queryResult
   try {
@@ -38,9 +36,8 @@ router.get('/availableOfCategory/:id', async (request, response) => {
   return response.json(queryResult.rows)
 })
 
-router.post('/', async (request, response) => {
+router.post('/', validateRequestBody, async (request, response) => {
   const productToAdd = request.body
-  if (!validate.productsPOST(productToAdd)) return response.status(400).json({ error: 'Incorrect input'})
 
   let queryResult
   try {
@@ -55,9 +52,8 @@ router.post('/', async (request, response) => {
   return response.status(200).send()
 })
 
-router.put('/available', async (request, response) => {
+router.put('/available', validateRequestBody, async (request, response) => {
   const productToModify = request.body
-  if (!validate.productsPUTavailable(productToModify)) return response.status(400).json({ error: 'Incorrect input'})
 
   let queryResult
   try {
@@ -72,9 +68,8 @@ router.put('/available', async (request, response) => {
   return response.status(200).send()
 })
 
-router.put('/newCategory', async (request, response) => {
+router.put('/newCategory', validateRequestBody, async (request, response) => {
   const productToModify = request.body
-  if (!validate.productsPUTnewCategory(productToModify)) return response.status(400).json({ error: 'Incorrect input'})
 
   let queryResult
   try {
@@ -89,9 +84,8 @@ router.put('/newCategory', async (request, response) => {
   return response.status(200).send()
 })
 
-router.put('/pricesAndSizes', async (request, response) => {
+router.put('/pricesAndSizes', validateRequestBody, async (request, response) => {
   const productToModify = request.body
-  if (!validate.productsPUTpricesAndSizes(productToModify)) return response.status(400).json({ error: 'Incorrect input'})
   
   let queryResult
   try {

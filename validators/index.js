@@ -1,7 +1,17 @@
 const Ajv = require("ajv")
 const ajv = new Ajv()
 
-const id = ajv.compile({
+// HTTP Request parameter validators:
+
+const validateRequestParameterID = (request, response, next) => {
+  const IdInObject = { id: Number(request.params.id)}
+
+  if (!IdInObject.id || !idValidator(IdInObject)) return response.status(400).json({ error: 'Incorrect input'})
+
+  next()
+}
+
+const idValidator = ajv.compile({
   type: "object",
   properties: {
       id: {type: "integer", minimum: 1}
@@ -10,18 +20,31 @@ const id = ajv.compile({
   additionalProperties: false
 })
 
-const categoriesPOST = ajv.compile({
-    type: "object",
-    properties: {
-        parentCategoryId: {type: "integer", minimum: 1, nullable: true},
-        name: {type: "string", minLength: 1},
-        description: {type: "string", nullable: true}
-    },
-    required: ["parentCategoryId", "name", "description"],
-    additionalProperties: false
-})
+// HTTP Request body validators:
 
-const categoriesPUTnewCategory = ajv.compile({
+const validateRequestBody = (request, response, next) => {
+  const validate = ajv.getSchema(request.method + request.baseUrl + request.path)
+
+  if (!validate) return response.status(500).send()  // Validator missing for the route!
+  if (!validate(request.body)) return response.status(400).json({ error: 'Incorrect input'})
+
+  next()
+}
+
+ajv.addSchema({
+  type: "object",
+  properties: {
+      parentCategoryId: {type: "integer", minimum: 1, nullable: true},
+      name: {type: "string", minLength: 1},
+      description: {type: "string", nullable: true}
+  },
+  required: ["parentCategoryId", "name", "description"],
+  additionalProperties: false
+},
+'POST/api/categories/')
+ajv.getSchema('POST/api/categories/')  // Triggers pre-compilation.
+
+ajv.addSchema({
   type: "object",
   properties: {
       id: {type: "integer", minimum: 1},
@@ -29,9 +52,11 @@ const categoriesPUTnewCategory = ajv.compile({
   },
   required: ["id", "parentCategoryId"],
   additionalProperties: false
-})
+}, 
+'PUT/api/categories/newCategory')
+ajv.getSchema('PUT/api/categories/newCategory')  // Triggers pre-compilation.
 
-const customersPOST = ajv.compile({
+ajv.addSchema({
   type: "object",
   properties: {
       name: {type: "string", minLength: 1},
@@ -42,9 +67,11 @@ const customersPOST = ajv.compile({
   },
   required: ["name", "address", "mobile", "email", "password"],
   additionalProperties: false
-})
+}, 
+'POST/api/customers/')
+ajv.getSchema('POST/api/customers/')  // Triggers pre-compilation.
 
-const customersPOSTlogin = ajv.compile({
+ajv.addSchema({
   type: "object",
   properties: {
       email: {type: "string", minLength: 5},
@@ -52,9 +79,11 @@ const customersPOSTlogin = ajv.compile({
   },
   required: ["email", "password"],
   additionalProperties: false
-})
+}, 
+'POST/api/customers/login')
+ajv.getSchema('POST/api/customers/login')  // Triggers pre-compilation.
 
-const ordersPOST = ajv.compile({
+ajv.addSchema({
   type: "array", minItems: 1, items: {
     type: "object",
     properties: {
@@ -72,9 +101,11 @@ const ordersPOST = ajv.compile({
     },
     required: ["product_id", "priceAndSize", "quantity"],
     additionalProperties: false}
-})
+}, 
+'POST/api/orders/')
+ajv.getSchema('POST/api/orders/')  // Triggers pre-compilation.
 
-const ordersPUTinternalNotes = ajv.compile({
+ajv.addSchema({
   type: "object",
   properties: {
       id: {type: "integer", minimum: 1},
@@ -82,18 +113,22 @@ const ordersPUTinternalNotes = ajv.compile({
   },
   required: ["id", "internalNotes"],
   additionalProperties: false
-})
+}, 
+'PUT/api/orders/internalNotes')
+ajv.getSchema('PUT/api/orders/internalNotes')  // Triggers pre-compilation.
 
-const ordersPUTorderDispatced = ajv.compile({
+ajv.addSchema({
   type: "object",
   properties: {
       id: {type: "integer", minimum: 1}
   },
   required: ["id"],
   additionalProperties: false
-})
+}, 
+'PUT/api/orders/orderDispatced')
+ajv.getSchema('PUT/api/orders/orderDispatced')  // Triggers pre-compilation.
 
-const productsPOST = ajv.compile({
+ajv.addSchema({
   type: "object",
   properties: {
       parentCategoryId: {type: "integer", minimum: 1, nullable: true},
@@ -113,9 +148,11 @@ const productsPOST = ajv.compile({
   },
   required: ["parentCategoryId", "name", "description", "pricesAndSizes", "available"],
   additionalProperties: false
-})
+}, 
+'POST/api/products/')
+ajv.getSchema('POST/api/products/')  // Triggers pre-compilation.
 
-const productsPUTavailable = ajv.compile({
+ajv.addSchema({
   type: "object",
   properties: {
       id: {type: "integer", minimum: 1},
@@ -123,9 +160,11 @@ const productsPUTavailable = ajv.compile({
   },
   required: ["id", "available"],
   additionalProperties: false
-})
+}, 
+'PUT/api/products/available')
+ajv.getSchema('PUT/api/products/available')  // Triggers pre-compilation.
 
-const productsPUTnewCategory = ajv.compile({
+ajv.addSchema({
   type: "object",
   properties: {
       id: {type: "integer", minimum: 1},
@@ -133,9 +172,11 @@ const productsPUTnewCategory = ajv.compile({
   },
   required: ["id", "parentCategoryId"],
   additionalProperties: false
-})
+}, 
+'PUT/api/products/newCategory')
+ajv.getSchema('PUT/api/products/newCategory')  // Triggers pre-compilation.
 
-const productsPUTpricesAndSizes = ajv.compile({
+ajv.addSchema({
   type: "object",
   properties: {
       id: {type: "integer", minimum: 1},
@@ -152,9 +193,8 @@ const productsPUTpricesAndSizes = ajv.compile({
   },
   required: ["id", "pricesAndSizes"],
   additionalProperties: false
-})
+}, 
+'PUT/api/products/pricesAndSizes')
+ajv.getSchema('PUT/api/products/pricesAndSizes')  // Triggers pre-compilation.
 
-module.exports = {id, categoriesPOST, categoriesPUTnewCategory, customersPOST, 
-  ordersPUTinternalNotes, ordersPUTorderDispatced, 
-  productsPUTavailable, productsPUTnewCategory, productsPUTpricesAndSizes,
-  productsPOST, ordersPOST, customersPOSTlogin}
+module.exports = {validateRequestParameterID, validateRequestBody}
