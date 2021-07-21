@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const database = require('../database')
-const {validateRequestParameterID, validateRequestBody} = require('../validators')
+const {validateRequestParameterID, validateRequestBody} = require('../utils/validators')
 
 router.get('/', async (request, response) => {
   let queryResult  

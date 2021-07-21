@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const database = require('../database')
-const {validateRequestParameterID, validateRequestBody} = require('../validators')
+const {validateRequestParameterID, validateRequestBody} = require('../utils/validators')
 
 router.get('/details/:id', validateRequestParameterID, async (request, response) => {
   const orderId = Number(request.params.id)

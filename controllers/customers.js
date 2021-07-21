@@ -1,7 +1,7 @@
 require('dotenv').config()
 const router = require('express').Router()
 const database = require('../database')
-const {validateRequestParameterID, validateRequestBody} = require('../validators')
+const {validateRequestParameterID, validateRequestBody} = require('../utils/validators')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 
