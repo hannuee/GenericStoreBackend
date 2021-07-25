@@ -83,5 +83,7 @@ test('customersPOSTlogin-endpoint logs in a customer succesfully', async () => {
 })
 
 afterAll(async () => {
+    await database.clearDatabaseIfNotEmpty()
+    await database.initializeDatabaseWithTestData()
     await database.endPool()
 })

@@ -15,7 +15,7 @@ router.get('/', async (request, response) => {
 router.post('/', validateRequestBody, async (request, response) => {
   const categoryToAdd = request.body
 
-  let queryResult 
+  let queryResult
   try {
     queryResult = await database.query('INSERT INTO public.Category(category_id, name, description) VALUES($1, $2, $3) RETURNING id', [categoryToAdd.parentCategoryId, categoryToAdd.name, categoryToAdd.description])
     if(queryResult.rows.length !== 1) throw 'error'

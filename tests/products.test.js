@@ -19,6 +19,16 @@ test('productsGET-endpoint returns all products, also unavailable ones', async (
     expect(response.body.find(product => product.name === 'Nissan Micra')).toBeDefined();
 }) 
 
+test('productsGETavailable-endpoint returns all available products', async () => {
+    const response = await api
+    .get('/api/products/available')
+    .expect(200)
+    .expect('Content-Type', /application\/json/)
+
+    expect(response.body).toHaveLength(2)
+    expect(response.body.find(product => product.name === 'Nissan Micra')).toBeUndefined();
+}) 
+
 test('productsGETofCategory-endpoint returns all products of a given category, also unavailable ones', async () => {
     const response = await api
     .get('/api/products/ofCategory/1')
@@ -128,5 +138,7 @@ test('productsPUTpricesAndSizes-endpoint modifies pricesAndSizes info of a produ
 })
 
 afterAll(async () => {
+    await database.clearDatabaseIfNotEmpty()
+    await database.initializeDatabaseWithTestData()
     await database.endPool()
 })

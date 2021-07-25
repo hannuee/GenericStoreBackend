@@ -198,5 +198,7 @@ test('ordersPUTorderDispatced-endpoint modifies orderDispatced of an order to cu
 
 
 afterAll(async () => {
+    await database.clearDatabaseIfNotEmpty()
+    await database.initializeDatabaseWithTestData()
     await database.endPool()
 })

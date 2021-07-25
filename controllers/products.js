@@ -12,6 +12,16 @@ router.get('/', async (request, response) => {
     return response.json(queryResult.rows)
 })
 
+router.get('/available', async (request, response) => {
+  let queryResult  
+  try {
+    queryResult = await database.query('SELECT * FROM public.Product WHERE available = TRUE')
+    } catch (error) {
+      return response.status(500).json({ error: 'Database error'})
+    }
+    return response.json(queryResult.rows)
+})
+
 router.get('/ofCategory/:id', validateRequestParameterID, async (request, response) => {
   const categoryIdToGetCategories = { id: Number(request.params.id)}
 

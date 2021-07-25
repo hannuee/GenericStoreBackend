@@ -88,5 +88,7 @@ test('categoriesPUTnewCategory-endpoint modifies parent category of a category',
 })
 
 afterAll(async () => {
+    await database.clearDatabaseIfNotEmpty()
+    await database.initializeDatabaseWithTestData()
     await database.endPool()
 })
