@@ -262,7 +262,7 @@ router.put('/internalNotes', validateRequestBody, async (request, response) => {
 
   let queryResult
   try {
-    const text = 'UPDATE public.Order SET internalNotes = $1 WHERE id = $2 RETURNING id'
+    const text = 'UPDATE public.Order SET internalNotes = $1 WHERE id = $2 RETURNING *'
     const values = [orderToModify.internalNotes, orderToModify.id]
     queryResult = await database.query(text, values)
     if(queryResult.rows.length !== 1) throw 'error'
@@ -270,7 +270,7 @@ router.put('/internalNotes', validateRequestBody, async (request, response) => {
     return response.status(500).json({ error: 'Database error'})
   }
 
-  return response.status(200).send()
+  return response.json(queryResult.rows[0])
 })
 
 router.put('/orderDispatced', validateRequestBody, async (request, response) => {
@@ -278,7 +278,7 @@ router.put('/orderDispatced', validateRequestBody, async (request, response) => 
 
   let queryResult
   try {
-    const text = 'UPDATE public.Order SET orderDispatched = CURRENT_TIMESTAMP WHERE id = $1 AND orderDispatched IS NULL RETURNING id'
+    const text = 'UPDATE public.Order SET orderDispatched = CURRENT_TIMESTAMP WHERE id = $1 AND orderDispatched IS NULL RETURNING *'
     const values = [orderToModify.id]
     queryResult = await database.query(text, values)
     if(queryResult.rows.length !== 1) throw 'error'
@@ -286,7 +286,7 @@ router.put('/orderDispatced', validateRequestBody, async (request, response) => 
     return response.status(500).json({ error: 'Database error'})
   }
 
-  return response.status(200).send()
+  return response.json(queryResult.rows[0])
 })
 
 module.exports = router

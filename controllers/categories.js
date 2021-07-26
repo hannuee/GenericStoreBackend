@@ -17,13 +17,13 @@ router.post('/', validateRequestBody, async (request, response) => {
 
   let queryResult
   try {
-    queryResult = await database.query('INSERT INTO public.Category(category_id, name, description) VALUES($1, $2, $3) RETURNING id', [categoryToAdd.parentCategoryId, categoryToAdd.name, categoryToAdd.description])
+    queryResult = await database.query('INSERT INTO public.Category(category_id, name, description) VALUES($1, $2, $3) RETURNING *', [categoryToAdd.parentCategoryId, categoryToAdd.name, categoryToAdd.description])
     if(queryResult.rows.length !== 1) throw 'error'
   } catch (error) {
     return response.status(500).json({ error: 'Database error'})
   }
 
-  return response.status(200).send()
+  return response.json(queryResult.rows[0])
 })
 
 router.delete('/:id', validateRequestParameterID, async (request, response) => {
@@ -45,7 +45,7 @@ router.put('/newCategory', validateRequestBody, async (request, response) => {
 
   let queryResult
   try {
-    const text = 'UPDATE public.Category SET category_id = $1 WHERE id = $2 RETURNING id'
+    const text = 'UPDATE public.Category SET category_id = $1 WHERE id = $2 RETURNING *'
     const values = [categoryToModify.parentCategoryId, categoryToModify.id]
     queryResult = await database.query(text, values)
     if(queryResult.rows.length !== 1) throw 'error'
@@ -53,7 +53,7 @@ router.put('/newCategory', validateRequestBody, async (request, response) => {
     return response.status(500).json({ error: 'Database error'})
   }
 
-  return response.status(200).send()
+  return response.json(queryResult.rows[0])
 })
 
 module.exports = router

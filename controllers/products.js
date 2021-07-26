@@ -51,7 +51,7 @@ router.post('/', validateRequestBody, async (request, response) => {
 
   let queryResult
   try {
-    const text = 'INSERT INTO public.Product(category_id, name, description, pricesAndSizes, available) VALUES($1, $2, $3, $4, $5) RETURNING id'
+    const text = 'INSERT INTO public.Product(category_id, name, description, pricesAndSizes, available) VALUES($1, $2, $3, $4, $5) RETURNING *'
     const values = [productToAdd.parentCategoryId, productToAdd.name, productToAdd.description, JSON.stringify(productToAdd.pricesAndSizes), productToAdd.available]
     queryResult = await database.query(text, values)
     if(queryResult.rows.length !== 1) throw 'error'
@@ -59,7 +59,7 @@ router.post('/', validateRequestBody, async (request, response) => {
     return response.status(500).json({ error: 'Database error'})
   }
 
-  return response.status(200).send()
+  return response.json(queryResult.rows[0])
 })
 
 router.put('/available', validateRequestBody, async (request, response) => {
@@ -67,7 +67,7 @@ router.put('/available', validateRequestBody, async (request, response) => {
 
   let queryResult
   try {
-    const text = 'UPDATE public.Product SET available = $1 WHERE id = $2 RETURNING id'
+    const text = 'UPDATE public.Product SET available = $1 WHERE id = $2 RETURNING *'
     const values = [productToModify.available, productToModify.id]
     queryResult = await database.query(text, values)
     if(queryResult.rows.length !== 1) throw 'error'
@@ -75,7 +75,7 @@ router.put('/available', validateRequestBody, async (request, response) => {
     return response.status(500).json({ error: 'Database error'})
   }
 
-  return response.status(200).send()
+  return response.json(queryResult.rows[0])
 })
 
 router.put('/newCategory', validateRequestBody, async (request, response) => {
@@ -83,7 +83,7 @@ router.put('/newCategory', validateRequestBody, async (request, response) => {
 
   let queryResult
   try {
-    const text = 'UPDATE public.Product SET category_id = $1 WHERE id = $2 RETURNING id'
+    const text = 'UPDATE public.Product SET category_id = $1 WHERE id = $2 RETURNING *'
     const values = [productToModify.parentCategoryId, productToModify.id]
     queryResult = await database.query(text, values)
     if(queryResult.rows.length !== 1) throw 'error'
@@ -91,7 +91,7 @@ router.put('/newCategory', validateRequestBody, async (request, response) => {
     return response.status(500).json({ error: 'Database error'})
   }
   
-  return response.status(200).send()
+  return response.json(queryResult.rows[0])
 })
 
 router.put('/pricesAndSizes', validateRequestBody, async (request, response) => {
@@ -99,7 +99,7 @@ router.put('/pricesAndSizes', validateRequestBody, async (request, response) => 
   
   let queryResult
   try {
-    const text = 'UPDATE public.Product SET pricesAndSizes = $1 WHERE id = $2 RETURNING id'
+    const text = 'UPDATE public.Product SET pricesAndSizes = $1 WHERE id = $2 RETURNING *'
     const values = [JSON.stringify(productToModify.pricesAndSizes), productToModify.id]
     queryResult = await database.query(text, values)
     if(queryResult.rows.length !== 1) throw 'error'
@@ -107,7 +107,7 @@ router.put('/pricesAndSizes', validateRequestBody, async (request, response) => 
     return response.status(500).json({ error: 'Database error'})
   }
 
-  return response.status(200).send()
+  return response.json(queryResult.rows[0])
 })
 
 module.exports = router

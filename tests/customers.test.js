@@ -71,12 +71,12 @@ test('customersPOSTlogin-endpoint logs in a customer succesfully', async () => {
         email: "sanna@hel.fi",
         password: "Super Uber passu"
     }
-    
+   
     const response = await api
     .post('/api/customers/login')
     .send(customerLoginInfo)
     .expect(200)
-
+ 
     const customer = response.body
     expect(customer.token.length > 20).toBe(true)
     expect(customer.name).toBe('Sanna')
