@@ -8,7 +8,7 @@ router.get('/details/:id', validateRequestParameterID, async (request, response)
   let queryResult
   try {
     const columns = 
-      'public.Order.id, public.Order.customer_id, public.Customer.name, public.Customer.address, public.Customer.mobile, public.Customer.email, ' +
+      'public.Order.id, public.Order.customer_id, public.Customer.name AS customer_name, public.Customer.address, public.Customer.mobile, public.Customer.email, ' +
       'public.Order.orderReceived, public.Order.orderDispatched, public.Order.purchaseprice, ' +
       'public.Order.customerinstructions, public.Order.internalnotes, ' +
       'public.ProductOrder.priceAndSize, public.ProductOrder.quantity, ' +
@@ -39,7 +39,7 @@ router.get('/details/:id', validateRequestParameterID, async (request, response)
       rowMap.set(row.id, {
         id: row.id,
         customer_id: row.customer_id,
-        name: row.name,
+        name: row.customer_name,
         address: row.address,
         mobile: row.mobile,
         email: row.email,
@@ -89,7 +89,7 @@ router.get('/undispatchedWithDetails', async (request, response) => {
   let queryResult
   try {
     const columns = 
-      'public.Order.id, public.Order.customer_id, public.Customer.name, public.Customer.address, public.Customer.mobile, public.Customer.email, ' +
+      'public.Order.id, public.Order.customer_id, public.Customer.name AS customer_name, public.Customer.address, public.Customer.mobile, public.Customer.email, ' +
       'public.Order.orderReceived, public.Order.orderDispatched, public.Order.purchaseprice, ' +
       'public.Order.customerinstructions, public.Order.internalnotes, ' +
       'public.ProductOrder.priceAndSize, public.ProductOrder.quantity, ' +
@@ -119,7 +119,7 @@ router.get('/undispatchedWithDetails', async (request, response) => {
       rowMap.set(row.id, {
         id: row.id,
         customer_id: row.customer_id,
-        name: row.name,
+        name: row.customer_name,
         address: row.address,
         mobile: row.mobile,
         email: row.email,
