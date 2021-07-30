@@ -8,15 +8,16 @@ router.get('/details/:id', validateRequestParameterID, async (request, response)
   let queryResult
   try {
     const columns = 
-      'public.Order.id, public.Order.customer_id, public.Order.orderReceived, public.Order.orderDispatched, public.Order.purchaseprice, ' +
+      'public.Order.id, public.Order.customer_id, public.Customer.name, public.Customer.address, public.Customer.mobile, public.Customer.email, ' +
+      'public.Order.orderReceived, public.Order.orderDispatched, public.Order.purchaseprice, ' +
       'public.Order.customerinstructions, public.Order.internalnotes, ' +
       'public.ProductOrder.priceAndSize, public.ProductOrder.quantity, ' +
       'public.Product.name'
     const joinCondition =  
-      'public.Order.id = public.ProductOrder.order_id AND public.ProductOrder.product_id = public.Product.id'
+      'public.Order.id = public.ProductOrder.order_id AND public.ProductOrder.product_id = public.Product.id AND public.Order.customer_id = public.Customer.id'
       
     const textMain = 
-      'SELECT ' + columns + ' FROM public.Order, public.ProductOrder, public.Product WHERE public.Order.id = $1 AND ' 
+      'SELECT ' + columns + ' FROM public.Order, public.ProductOrder, public.Product, public.Customer WHERE public.Order.id = $1 AND ' 
       + joinCondition
 
       queryResult = await database.query(textMain, [orderId])
@@ -38,6 +39,10 @@ router.get('/details/:id', validateRequestParameterID, async (request, response)
       rowMap.set(row.id, {
         id: row.id,
         customer_id: row.customer_id,
+        name: row.name,
+        address: row.address,
+        mobile: row.mobile,
+        email: row.email,
         orderreceived: row.orderreceived,
         orderdispatched: row.orderdispatched,
         purchaseprice: row.purchaseprice,
@@ -84,15 +89,16 @@ router.get('/undispatchedWithDetails', async (request, response) => {
   let queryResult
   try {
     const columns = 
-      'public.Order.id, public.Order.customer_id, public.Order.orderReceived, public.Order.orderDispatched, public.Order.purchaseprice, ' +
+      'public.Order.id, public.Order.customer_id, public.Customer.name, public.Customer.address, public.Customer.mobile, public.Customer.email, ' +
+      'public.Order.orderReceived, public.Order.orderDispatched, public.Order.purchaseprice, ' +
       'public.Order.customerinstructions, public.Order.internalnotes, ' +
       'public.ProductOrder.priceAndSize, public.ProductOrder.quantity, ' +
       'public.Product.name'
     const joinCondition =  
-      'public.Order.id = public.ProductOrder.order_id AND public.ProductOrder.product_id = public.Product.id'
+      'public.Order.id = public.ProductOrder.order_id AND public.ProductOrder.product_id = public.Product.id AND public.Order.customer_id = public.Customer.id'
       
     const textMain = 
-      'SELECT ' + columns + ' FROM public.Order, public.ProductOrder, public.Product WHERE public.Order.orderDispatched IS NULL AND ' 
+      'SELECT ' + columns + ' FROM public.Order, public.ProductOrder, public.Product, public.Customer WHERE public.Order.orderDispatched IS NULL AND ' 
       + joinCondition
 
       queryResult = await database.query(textMain)
@@ -113,6 +119,10 @@ router.get('/undispatchedWithDetails', async (request, response) => {
       rowMap.set(row.id, {
         id: row.id,
         customer_id: row.customer_id,
+        name: row.name,
+        address: row.address,
+        mobile: row.mobile,
+        email: row.email,
         orderreceived: row.orderreceived,
         orderdispatched: row.orderdispatched,
         purchaseprice: row.purchaseprice,
