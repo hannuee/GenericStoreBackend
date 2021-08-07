@@ -1,8 +1,9 @@
 const router = require('express').Router()
 const database = require('../database')
 const {validateRequestParameterID, validateRequestBody} = require('../utils/validators')
+const { authorizeAdmin } = require('../utils/middleware')
 
-router.get('/', async (request, response) => {
+router.get('/', authorizeAdmin, async (request, response) => {
   let queryResult  
   try {
     queryResult = await database.query('SELECT * FROM public.Product')
@@ -22,7 +23,7 @@ router.get('/available', async (request, response) => {
     return response.json(queryResult.rows)
 })
 
-router.get('/ofCategory/:id', validateRequestParameterID, async (request, response) => {
+router.get('/ofCategory/:id', authorizeAdmin, validateRequestParameterID, async (request, response) => {
   const categoryIdToGetCategories = { id: Number(request.params.id)}
 
   let queryResult
@@ -46,7 +47,7 @@ router.get('/availableOfCategory/:id', validateRequestParameterID, async (reques
   return response.json(queryResult.rows)
 })
 
-router.post('/', validateRequestBody, async (request, response) => {
+router.post('/', authorizeAdmin, validateRequestBody, async (request, response) => {
   const productToAdd = request.body
 
   let queryResult
@@ -62,7 +63,7 @@ router.post('/', validateRequestBody, async (request, response) => {
   return response.json(queryResult.rows[0])
 })
 
-router.put('/available', validateRequestBody, async (request, response) => {
+router.put('/available', authorizeAdmin, validateRequestBody, async (request, response) => {
   const productToModify = request.body
 
   let queryResult
@@ -78,7 +79,7 @@ router.put('/available', validateRequestBody, async (request, response) => {
   return response.json(queryResult.rows[0])
 })
 
-router.put('/newCategory', validateRequestBody, async (request, response) => {
+router.put('/newCategory', authorizeAdmin, validateRequestBody, async (request, response) => {
   const productToModify = request.body
 
   let queryResult
@@ -94,7 +95,7 @@ router.put('/newCategory', validateRequestBody, async (request, response) => {
   return response.json(queryResult.rows[0])
 })
 
-router.put('/pricesAndSizes', validateRequestBody, async (request, response) => {
+router.put('/pricesAndSizes', authorizeAdmin, validateRequestBody, async (request, response) => {
   const productToModify = request.body
   
   let queryResult

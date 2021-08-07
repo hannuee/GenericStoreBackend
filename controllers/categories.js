@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const database = require('../database')
 const {validateRequestParameterID, validateRequestBody} = require('../utils/validators')
+const { authorizeAdmin } = require('../utils/middleware')
 
 router.get('/', async (request, response) => {
   let queryResult
@@ -12,7 +13,7 @@ router.get('/', async (request, response) => {
   return response.json(queryResult.rows)
 })
 
-router.post('/', validateRequestBody, async (request, response) => {
+router.post('/', authorizeAdmin, validateRequestBody, async (request, response) => {
   const categoryToAdd = request.body
 
   let queryResult
@@ -26,7 +27,7 @@ router.post('/', validateRequestBody, async (request, response) => {
   return response.json(queryResult.rows[0])
 })
 
-router.delete('/:id', validateRequestParameterID, async (request, response) => {
+router.delete('/:id', authorizeAdmin, validateRequestParameterID, async (request, response) => {
   const categoryIdToDelete = { id: Number(request.params.id)}
 
   let queryResult
@@ -40,7 +41,7 @@ router.delete('/:id', validateRequestParameterID, async (request, response) => {
   return response.status(200).send()
 })
 
-router.put('/newCategory', validateRequestBody, async (request, response) => {
+router.put('/newCategory', authorizeAdmin, validateRequestBody, async (request, response) => {
   const categoryToModify = request.body
 
   let queryResult

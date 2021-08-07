@@ -1,9 +1,9 @@
 const router = require('express').Router()
 const database = require('../database')
 const {validateRequestParameterID, validateRequestBody} = require('../utils/validators')
-const { authorizeCustomer } = require('../utils/middleware')
+const { authorizeCustomer, authorizeAdmin } = require('../utils/middleware')
 
-router.get('/details/:id', validateRequestParameterID, async (request, response) => {
+router.get('/details/:id', authorizeAdmin, validateRequestParameterID, async (request, response) => {
   const orderId = Number(request.params.id)
 
   let queryResult
@@ -66,7 +66,7 @@ router.get('/details/:id', validateRequestParameterID, async (request, response)
   return response.json(formattedResult[0])
 })
 
-router.get('/', async (request, response) => {
+router.get('/', authorizeAdmin, async (request, response) => {
   let queryResult
   try {
     queryResult = await database.query('SELECT * FROM public.Order')
@@ -76,7 +76,7 @@ router.get('/', async (request, response) => {
   return response.json(queryResult.rows)
 })
 
-router.get('/dispatched', async (request, response) => {
+router.get('/dispatched', authorizeAdmin, async (request, response) => {
   let queryResult
   try {
     queryResult = await database.query('SELECT * FROM public.Order WHERE orderDispatched IS NOT NULL')
@@ -86,7 +86,7 @@ router.get('/dispatched', async (request, response) => {
   return response.json(queryResult.rows)
 })
 
-router.get('/undispatchedWithDetails', async (request, response) => {
+router.get('/undispatchedWithDetails', authorizeAdmin, async (request, response) => {
   let queryResult
   try {
     const columns =
@@ -269,7 +269,7 @@ router.post('/', validateRequestBody, authorizeCustomer, async (request, respons
   return response.status(200).send()
 })
 
-router.put('/internalNotes', validateRequestBody, async (request, response) => {
+router.put('/internalNotes', authorizeAdmin, validateRequestBody, async (request, response) => {
   const orderToModify = request.body
 
   let queryResult
@@ -285,7 +285,7 @@ router.put('/internalNotes', validateRequestBody, async (request, response) => {
   return response.json(queryResult.rows[0])
 })
 
-router.put('/orderDispatced', validateRequestBody, async (request, response) => {
+router.put('/orderDispatced', authorizeAdmin, validateRequestBody, async (request, response) => {
   const orderToModify = request.body
 
   let queryResult

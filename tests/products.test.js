@@ -4,14 +4,35 @@ const database = require('../database')
 
 const api = supertest(app)
 
+let adminsToken
+
 beforeAll(async () => {
     await database.clearDatabaseIfNotEmpty()
     await database.initializeDatabaseWithTestData()
+
+    // Admin login:
+    const adminLoginInfo = {
+        email: "admin@suo.mi",
+        password: "adminin Pitkä! salasana"
+    }
+
+    const responseAdmin = await api
+        .post('/api/customers/login')
+        .send(adminLoginInfo)
+        .expect(200)
+
+    const admin = responseAdmin.body
+    expect(admin.token.length > 20).toBe(true)
+    expect(admin.admin).toBe(true)
+
+    // Save the token:
+    adminsToken = admin.token
 });
 
 test('productsGET-endpoint returns all products, also unavailable ones', async () => {
     const response = await api
     .get('/api/products')
+    .set('authorization', 'Bearer ' + adminsToken)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -32,6 +53,7 @@ test('productsGETavailable-endpoint returns all available products', async () =>
 test('productsGETofCategory-endpoint returns all products of a given category, also unavailable ones', async () => {
     const response = await api
     .get('/api/products/ofCategory/1')
+    .set('authorization', 'Bearer ' + adminsToken)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -60,12 +82,14 @@ test('productsPOST-endpoint adds new product succesfully', async () => {
     
     const response = await api
     .post('/api/products/')
+    .set('authorization', 'Bearer ' + adminsToken)
     .send(newCar)
     .expect(200)
 
     // Let's make another HTTP request to verify that the pervious one was succesful:
     const response2 = await api
     .get('/api/products/ofCategory/2')
+    .set('authorization', 'Bearer ' + adminsToken)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -81,12 +105,14 @@ test('productsPUTavailable-endpoint modifies availability status of a product', 
     
     const response = await api
     .put('/api/products/available')
+    .set('authorization', 'Bearer ' + adminsToken)
     .send(newStatus)
     .expect(200)
 
     // Let's make another HTTP request to verify that the pervious one was succesful:
     const response2 = await api
     .get('/api/products/availableOfCategory/1')
+    .set('authorization', 'Bearer ' + adminsToken)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -102,12 +128,14 @@ test('productsPUTnewCategory-endpoint modifies parent category of a product', as
     
     const response = await api
     .put('/api/products/newCategory')
+    .set('authorization', 'Bearer ' + adminsToken)
     .send(newCategory)
     .expect(200)
 
     // Let's make another HTTP request to verify that the pervious one was succesful:
     const response2 = await api
     .get('/api/products/OfCategory/2')
+    .set('authorization', 'Bearer ' + adminsToken)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -123,12 +151,14 @@ test('productsPUTpricesAndSizes-endpoint modifies pricesAndSizes info of a produ
     
     const response = await api
     .put('/api/products/pricesAndSizes')
+    .set('authorization', 'Bearer ' + adminsToken)
     .send(newPricesAndSizes)
     .expect(200)
 
     // Let's make another HTTP request to verify that the pervious one was succesful:
     const response2 = await api
     .get('/api/products/OfCategory/1')
+    .set('authorization', 'Bearer ' + adminsToken)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 

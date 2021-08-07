@@ -5,10 +5,31 @@ const database = require('../database')
 const api = supertest(app)
 
 let emmasToken
+let adminsToken
 
 beforeAll(async () => {
     await database.clearDatabaseIfNotEmpty()
-    await database.initializeDatabaseWithTestData()
+    await database.initializeDatabaseWithTestData()         
+
+    
+    // Admin login:
+    const adminLoginInfo = {
+        email: "admin@suo.mi",
+        password: "adminin Pitkä! salasana"
+    }
+
+    const responseAdmin = await api
+        .post('/api/customers/login')
+        .send(adminLoginInfo)
+        .expect(200)
+
+    const admin = responseAdmin.body
+    expect(admin.token.length > 20).toBe(true)
+    expect(admin.admin).toBe(true)
+
+    // Save the token:
+    adminsToken = admin.token
+
 
     // Customer login:
     const customerLoginInfo = {
@@ -32,6 +53,7 @@ beforeAll(async () => {
 test('ordersGETdetails-endpoint returns the order asked, with product details', async () => {
     const response = await api
     .get('/api/orders/details/2')
+    .set('authorization', 'Bearer ' + adminsToken)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -50,6 +72,7 @@ test('ordersGETdetails-endpoint returns the order asked, with product details', 
 test('ordersGET-endpoint returns all orders', async () => {
     const response = await api
     .get('/api/orders')
+    .set('authorization', 'Bearer ' + adminsToken)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -61,6 +84,7 @@ test('ordersGET-endpoint returns all orders', async () => {
 test('ordersGETdispatched-endpoint returns all dispatched orders', async () => {
     const response = await api
     .get('/api/orders/dispatched')
+    .set('authorization', 'Bearer ' + adminsToken)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -72,6 +96,7 @@ test('ordersGETdispatched-endpoint returns all dispatched orders', async () => {
 test('ordersGETundispatchedWithDetails-endpoint returns all undispatched orders, with product details', async () => {
     const response = await api
     .get('/api/orders/undispatchedWithDetails')
+    .set('authorization', 'Bearer ' + adminsToken)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -185,12 +210,14 @@ test('ordersPUTinternalNotes-endpoint modifies internalNotes of an order', async
     
     const response = await api
     .put('/api/orders/internalNotes')
+    .set('authorization', 'Bearer ' + adminsToken)
     .send(newInternalNotes)
     .expect(200)
 
     // Let's make another HTTP request to verify that the pervious one was succesful:
     const response2 = await api
     .get('/api/orders/details/2')
+    .set('authorization', 'Bearer ' + adminsToken)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -206,12 +233,14 @@ test('ordersPUTorderDispatced-endpoint modifies orderDispatced of an order to cu
     
     const response = await api
     .put('/api/orders/orderDispatced')
+    .set('authorization', 'Bearer ' + adminsToken)
     .send(orderIdInObject)
     .expect(200)
 
     // Let's make another HTTP request to verify that the pervious one was succesful:
     const response2 = await api
     .get('/api/orders/details/2')
+    .set('authorization', 'Bearer ' + adminsToken)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 

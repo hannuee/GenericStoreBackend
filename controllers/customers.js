@@ -5,8 +5,9 @@ const {validateRequestParameterID, validateRequestBody} = require('../utils/vali
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const config = require('../utils/config')
+const { authorizeAdmin } = require('../utils/middleware')
 
-router.get('/', async (request, response) => {
+router.get('/', authorizeAdmin, async (request, response) => {
   let queryResult
   try {
     queryResult = await database.query('SELECT id, name FROM public.Customer')
@@ -16,7 +17,7 @@ router.get('/', async (request, response) => {
   return response.json(queryResult.rows)
 })
 
-router.get('/:id', validateRequestParameterID, async (request, response) => {
+router.get('/:id', authorizeAdmin, validateRequestParameterID, async (request, response) => {
   const customerId = Number(request.params.id)
 
   let queryResult
@@ -35,7 +36,7 @@ router.post('/', validateRequestBody, async (request, response) => {
 
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(customerToAdd.password, saltRounds)
-  
+
   let queryResult
   try {
     const text = 'INSERT INTO public.Customer(name, address, mobile, email, passwordHash) VALUES($1, $2, $3, $4, $5) RETURNING id'

@@ -4,14 +4,35 @@ const database = require('../database')
 
 const api = supertest(app)
 
+let adminsToken
+
 beforeAll(async () => {
     await database.clearDatabaseIfNotEmpty()
     await database.initializeDatabaseWithTestData()
+
+    // Admin login:
+    const adminLoginInfo = {
+        email: "admin@suo.mi",
+        password: "adminin Pitkä! salasana"
+    }
+
+    const responseAdmin = await api
+        .post('/api/customers/login')
+        .send(adminLoginInfo)
+        .expect(200)
+
+    const admin = responseAdmin.body
+    expect(admin.token.length > 20).toBe(true)
+    expect(admin.admin).toBe(true)
+
+    // Save the token:
+    adminsToken = admin.token
 });
 
 test('customersGET-endpoint returns all customers with limited information', async () => {
     const response = await api
     .get('/api/customers')
+    .set('authorization', 'Bearer ' + adminsToken)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -25,6 +46,7 @@ test('customersGET-endpoint returns all customers with limited information', asy
 test('customersGET-endpoint with id returns one customer with all information, but no passwordHash', async () => {
     const response = await api
     .get('/api/customers/1')
+    .set('authorization', 'Bearer ' + adminsToken)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -54,6 +76,7 @@ test('customersPOST-endpoint adds a new customer succesfully', async () => {
     // Let's make another HTTP request to verify that the pervious one was succesful:
     const response2 = await api
     .get('/api/customers/3')
+    .set('authorization', 'Bearer ' + adminsToken)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
