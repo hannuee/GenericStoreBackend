@@ -21,7 +21,7 @@ const buildDatabaseStatements = [
     'name TEXT,' +
     'description TEXT DEFAULT NULL,' +
     'picture JSON DEFAULT NULL)',
-  
+
   'CREATE TABLE public.Product (' +
     'id SERIAL PRIMARY KEY,' +
     'category_id INTEGER REFERENCES public.Category(id) ON DELETE RESTRICT,' +
@@ -70,23 +70,25 @@ const testDataInsertStatements = [
   'VALUES (3, \'Toyota Landcruiser\', \'An SUV.\', \'[{\"price\": 8000000, \"size": \"5 seater\"}, {\"price\": 12000000, \"size\": \"7 seater\"}]\', TRUE)',
 
   'INSERT INTO public.Customer (name, address, mobile, email, passwordHash)' +
-  'VALUES (\'Emma\', \'Finland\', \'050 1234567\', \'emma@suomi.fi\', \'emmansalasana\')',
+  'VALUES (\'Emma\', \'Finland\', \'050 1234567\', \'emma@suomi.fi\', \'\$2b\$10\$hE30LgwiIpN8d2u9uxf./OrKN0F8Hw1vIrYWlpGAYxyYZkjLrRq3S\')',  // emmansalasana
   'INSERT INTO public.Customer (name, address, mobile, email, passwordHash)' +
-  'VALUES (\'Matti\', \'Finland\', \'040 1234567\', \'matti@suomi.fi\', \'matinsalasana\')',
+  'VALUES (\'Matti\', \'Finland\', \'040 1234567\', \'matti@suomi.fi\', \'\$2b\$10\$BbPCmBZj.bNAIoLocQe8eOpgSLt5ci2KhIjenqRswTw4cA9nm9Ga6\')',  // matinsalasana
 
   'INSERT INTO public.Order (customer_id, purchasePrice, customerInstructions)' +
   'VALUES (1, 8000000, \'Toimitus iltapäivällä.\')',
   'INSERT INTO public.Order (customer_id, purchasePrice, customerInstructions)' +
   'VALUES (2, 19600000, \'Toimitus aamulla.\')',
   'INSERT INTO public.Order (customer_id, orderDispatched, purchasePrice, customerInstructions)' +
-  'VALUES (2, CURRENT_TIMESTAMP, 0, \'Tilaus joka on jo toimitettu.\')',
+  'VALUES (2, CURRENT_TIMESTAMP, 8000000, \'Tilaus joka on jo toimitettu.\')',
 
   'INSERT INTO public.ProductOrder (product_id, order_id, priceAndSize, quantity)' +
   'VALUES (3, 1, \'{\"price\": 8000000, \"size\": \"5 seater\"}\', 1)',
   'INSERT INTO public.ProductOrder (product_id, order_id, priceAndSize, quantity)' +
   'VALUES (1, 2, \'{\"price\": 3800000, \"size\": \"5 seater\"}\', 2)',
   'INSERT INTO public.ProductOrder (product_id, order_id, priceAndSize, quantity)' +
-  'VALUES (3, 2, \'{\"price\": 12000000, \"size\": \"7 seater\"}\', 1)'
+  'VALUES (3, 2, \'{\"price\": 12000000, \"size\": \"7 seater\"}\', 1)',
+  'INSERT INTO public.ProductOrder (product_id, order_id, priceAndSize, quantity)' +
+  'VALUES (3, 3, \'{\"price\": 8000000, \"size\": \"5 seater\"}\', 1)',
 ]
 
 const clearDatabaseIfNotEmpty = async () => {

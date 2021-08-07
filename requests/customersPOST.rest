@@ -5,6 +5,6 @@ Content-Type: application/json
     "name": "Jack",
     "address": "Miami",
     "mobile": "045 1234567",
-    "email": "jack@mi.ami",
-    "password": "Super Uber passu"
+    "email": "jackkk@mi.ami",
+    "password": "matinsalasana"
 }

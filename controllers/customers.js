@@ -4,9 +4,10 @@ const database = require('../database')
 const {validateRequestParameterID, validateRequestBody} = require('../utils/validators')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
+const config = require('../utils/config')
 
 router.get('/', async (request, response) => {
-  let queryResult  
+  let queryResult
   try {
     queryResult = await database.query('SELECT id, name FROM public.Customer')
     } catch (error) {
@@ -34,7 +35,7 @@ router.post('/', validateRequestBody, async (request, response) => {
 
   const saltRounds = 10
   const passwordHash = await bcrypt.hash(customerToAdd.password, saltRounds)
-
+  
   let queryResult
   try {
     const text = 'INSERT INTO public.Customer(name, address, mobile, email, passwordHash) VALUES($1, $2, $3, $4, $5) RETURNING id'
@@ -42,7 +43,7 @@ router.post('/', validateRequestBody, async (request, response) => {
     queryResult = await database.query(text, values)
     if(queryResult.rows.length !== 1) throw 'error'
   } catch (error) {
-    return response.status(500).json({ error: 'Database error'})
+    return response.status(500).json({ error: error.message})
   }
 
   return response.status(200).send()
@@ -52,9 +53,24 @@ router.post('/', validateRequestBody, async (request, response) => {
 router.post('/login', validateRequestBody, async (request, response) => {
   const customerToLogin = request.body
 
+  // Admin login:
+  if (config.ADMIN_EMAIL === customerToLogin.email.trim()) {
+    const adminPasswordCorrect = await bcrypt.compare(customerToLogin.password, config.ADMIN_PASSWORD_HASH)
+    if (!adminPasswordCorrect) return response.status(401).json({ error: 'Incorrect email or password' })
+
+    const adminToken = jwt.sign(
+      {
+        admin: true,
+      },
+      process.env.SECRET, { expiresIn: "6h" })
+  
+    return response.status(200).send({ token: adminToken, admin: true })
+  }
+
+  // Customer login:
   let queryResult
   try {
-    queryResult = await database.query('SELECT * FROM public.Customer WHERE email = $1', [customerToLogin.email])
+    queryResult = await database.query('SELECT * FROM public.Customer WHERE email = $1', [customerToLogin.email.trim()])
   } catch (error) {
     return response.status(500).json({ error: 'Database error'})
   }
@@ -70,7 +86,7 @@ router.post('/login', validateRequestBody, async (request, response) => {
       id: customer.id
     },
     process.env.SECRET, { expiresIn: "6h" })
-  
+
   return response.status(200).send({ token, name: customer.name })
 })
 

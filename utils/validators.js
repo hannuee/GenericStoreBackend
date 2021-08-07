@@ -1,9 +1,10 @@
 const Ajv = require("ajv")
 const ajv = new Ajv()
 
+
 // HTTP Request parameter validators:
 
-const validateRequestParameterID = (request, response, next) => {
+const validateRequestParameterID = (request, response, next) => {  // Main validator middleware
   const IdInObject = { id: Number(request.params.id)}
 
   if (!IdInObject.id || !idValidator(IdInObject)) return response.status(400).json({ error: 'Incorrect input'})
@@ -20,9 +21,10 @@ const idValidator = ajv.compile({
   additionalProperties: false
 })
 
+
 // HTTP Request body validators:
 
-const validateRequestBody = (request, response, next) => {
+const validateRequestBody = (request, response, next) => {  // Main validator middleware
   const validate = ajv.getSchema(request.method + request.baseUrl + request.path)
 
   if (!validate) return response.status(500).send()  // Validator missing for the route!

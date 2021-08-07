@@ -1,23 +1,24 @@
 const router = require('express').Router()
 const database = require('../database')
 const {validateRequestParameterID, validateRequestBody} = require('../utils/validators')
+const { authorizeCustomer } = require('../utils/middleware')
 
 router.get('/details/:id', validateRequestParameterID, async (request, response) => {
   const orderId = Number(request.params.id)
 
   let queryResult
   try {
-    const columns = 
+    const columns =
       'public.Order.id, public.Order.customer_id, public.Customer.name AS customer_name, public.Customer.address, public.Customer.mobile, public.Customer.email, ' +
       'public.Order.orderReceived, public.Order.orderDispatched, public.Order.purchaseprice, ' +
       'public.Order.customerinstructions, public.Order.internalnotes, ' +
       'public.ProductOrder.priceAndSize, public.ProductOrder.quantity, ' +
       'public.Product.name'
-    const joinCondition =  
+    const joinCondition =
       'public.Order.id = public.ProductOrder.order_id AND public.ProductOrder.product_id = public.Product.id AND public.Order.customer_id = public.Customer.id'
-      
-    const textMain = 
-      'SELECT ' + columns + ' FROM public.Order, public.ProductOrder, public.Product, public.Customer WHERE public.Order.id = $1 AND ' 
+
+    const textMain =
+      'SELECT ' + columns + ' FROM public.Order, public.ProductOrder, public.Product, public.Customer WHERE public.Order.id = $1 AND '
       + joinCondition
 
       queryResult = await database.query(textMain, [orderId])
@@ -56,7 +57,7 @@ router.get('/details/:id', validateRequestParameterID, async (request, response)
       })
     }
   }
-  
+
   const formattedResult = []
   for(let row of rowMap.values()){
     formattedResult.push(row)
@@ -66,7 +67,7 @@ router.get('/details/:id', validateRequestParameterID, async (request, response)
 })
 
 router.get('/', async (request, response) => {
-  let queryResult  
+  let queryResult
   try {
     queryResult = await database.query('SELECT * FROM public.Order')
     } catch (error) {
@@ -75,10 +76,10 @@ router.get('/', async (request, response) => {
   return response.json(queryResult.rows)
 })
 
-router.get('/undispatched', async (request, response) => {
+router.get('/dispatched', async (request, response) => {
   let queryResult
   try {
-    queryResult = await database.query('SELECT * FROM public.Order WHERE orderDispatched IS NULL')
+    queryResult = await database.query('SELECT * FROM public.Order WHERE orderDispatched IS NOT NULL')
     } catch (error) {
       return response.status(500).json({ error: 'Database error'})
     }
@@ -88,17 +89,17 @@ router.get('/undispatched', async (request, response) => {
 router.get('/undispatchedWithDetails', async (request, response) => {
   let queryResult
   try {
-    const columns = 
+    const columns =
       'public.Order.id, public.Order.customer_id, public.Customer.name AS customer_name, public.Customer.address, public.Customer.mobile, public.Customer.email, ' +
       'public.Order.orderReceived, public.Order.orderDispatched, public.Order.purchaseprice, ' +
       'public.Order.customerinstructions, public.Order.internalnotes, ' +
       'public.ProductOrder.priceAndSize, public.ProductOrder.quantity, ' +
       'public.Product.name'
-    const joinCondition =  
+    const joinCondition =
       'public.Order.id = public.ProductOrder.order_id AND public.ProductOrder.product_id = public.Product.id AND public.Order.customer_id = public.Customer.id'
-      
-    const textMain = 
-      'SELECT ' + columns + ' FROM public.Order, public.ProductOrder, public.Product, public.Customer WHERE public.Order.orderDispatched IS NULL AND ' 
+
+    const textMain =
+      'SELECT ' + columns + ' FROM public.Order, public.ProductOrder, public.Product, public.Customer WHERE public.Order.orderDispatched IS NULL AND '
       + joinCondition
 
       queryResult = await database.query(textMain)
@@ -136,7 +137,7 @@ router.get('/undispatchedWithDetails', async (request, response) => {
       })
     }
   }
-  
+
   const formattedResult = []
   for(let row of rowMap.values()){
     formattedResult.push(row)
@@ -145,21 +146,21 @@ router.get('/undispatchedWithDetails', async (request, response) => {
   return response.json(formattedResult)
 })
 
-router.get('/ofCustomerWithDetails/:id', validateRequestParameterID, async (request, response) => {
-  const customerIdToGetOrders = { id: Number(request.params.id)}
-  
+router.get('/ofCustomerWithDetails', authorizeCustomer, async (request, response) => {
+  const customerIdToGetOrders = { id: request.body.verifiedCustomerId }  // Authorization middleware adds customer_id to the request body
+
   let queryResult
   try {
-    const columns = 
+    const columns =
       'public.Order.id, public.Order.customer_id, public.Order.orderReceived, public.Order.orderDispatched, public.Order.purchaseprice, ' +
       'public.Order.customerinstructions, ' +
       'public.ProductOrder.priceAndSize, public.ProductOrder.quantity, ' +
       'public.Product.name'
-    const joinCondition =  
+    const joinCondition =
       'public.Order.id = public.ProductOrder.order_id AND public.ProductOrder.product_id = public.Product.id'
-      
-    const textMain = 
-      'SELECT ' + columns + ' FROM public.Order, public.ProductOrder, public.Product WHERE public.Order.customer_id = $1 AND ' 
+
+    const textMain =
+      'SELECT ' + columns + ' FROM public.Order, public.ProductOrder, public.Product WHERE public.Order.customer_id = $1 AND '
       + joinCondition
 
       queryResult = await database.query(textMain, [customerIdToGetOrders.id])
@@ -192,7 +193,7 @@ router.get('/ofCustomerWithDetails/:id', validateRequestParameterID, async (requ
       })
     }
   }
-  
+
   const formattedResult = []
   for(let row of rowMap.values()){
     formattedResult.push(row)
@@ -201,8 +202,9 @@ router.get('/ofCustomerWithDetails/:id', validateRequestParameterID, async (requ
   return response.json(formattedResult)
 })
 
-router.post('/', validateRequestBody, async (request, response) => {
-  const itemsOfOrder = request.body
+router.post('/', validateRequestBody, authorizeCustomer, async (request, response) => {
+  const itemsOfOrder = request.body.content
+  const verifiedCustomerId = request.body.verifiedCustomerId // Authorization middleware adds customer_id to the request body
 
   let totalPriceOfOrder = 0
 
@@ -243,7 +245,7 @@ router.post('/', validateRequestBody, async (request, response) => {
     await client.query('BEGIN')
 
     // Add the Order to DB:
-    const orderInsertResult = await client.query('INSERT INTO public.Order(customer_id , purchasePrice) VALUES($1, $2) RETURNING id', [1, totalPriceOfOrder])
+    const orderInsertResult = await client.query('INSERT INTO public.Order(customer_id , purchasePrice) VALUES($1, $2) RETURNING id', [verifiedCustomerId, totalPriceOfOrder])
     if(orderInsertResult.rows.length !== 1) throw 'error'
     order_id = orderInsertResult.rows[0].id
 

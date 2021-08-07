@@ -66,20 +66,70 @@ test('customersPOST-endpoint adds a new customer succesfully', async () => {
     expect(customer.passwordHash).toBeUndefined()
 })
 
-test('customersPOSTlogin-endpoint logs in a customer succesfully', async () => {
-    const customerLoginInfo = {
-        email: "sanna@hel.fi",
-        password: "Super Uber passu"
-    }
-   
-    const response = await api
-    .post('/api/customers/login')
-    .send(customerLoginInfo)
-    .expect(200)
- 
-    const customer = response.body
-    expect(customer.token.length > 20).toBe(true)
-    expect(customer.name).toBe('Sanna')
+describe('customersPOSTlogin-endpoint', () => {
+
+    test('logs in a customer succesfully', async () => {
+        const customerLoginInfo = {
+            email: "sanna@hel.fi",
+            password: "Super Uber passu"
+        }
+
+        const response = await api
+            .post('/api/customers/login')
+            .send(customerLoginInfo)
+            .expect(200)
+
+        const customer = response.body
+        expect(customer.token.length > 20).toBe(true)
+        expect(customer.name).toBe('Sanna')
+    })
+
+    test('does not log in a customer with wrong password', async () => {
+        const customerLoginInfo = {
+            email: "sanna@hel.fi",
+            password: "Super Uber pass"
+        }
+
+        const response = await api
+            .post('/api/customers/login')
+            .send(customerLoginInfo)
+            .expect(401)
+
+        const errorResponse = response.body
+        expect(errorResponse.error).toBe('Incorrect email or password')
+    })
+
+    test('logs in admin succesfully', async () => {
+        const customerLoginInfo = {
+            email: "admin@suo.mi",
+            password: "adminin Pitkä! salasana"
+        }
+
+        const response = await api
+            .post('/api/customers/login')
+            .send(customerLoginInfo)
+            .expect(200)
+
+        const customer = response.body
+        expect(customer.token.length > 20).toBe(true)
+        expect(customer.admin).toBe(true)
+    })
+
+    test('does not log in admin with wrong password', async () => {
+        const customerLoginInfo = {
+            email: "admin@suo.mi",
+            password: "adminin Pitkä salasana"
+        }
+
+        const response = await api
+            .post('/api/customers/login')
+            .send(customerLoginInfo)
+            .expect(401)
+
+        const errorResponse = response.body
+        expect(errorResponse.error).toBe('Incorrect email or password')
+    })
+
 })
 
 afterAll(async () => {

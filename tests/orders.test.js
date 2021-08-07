@@ -4,9 +4,29 @@ const database = require('../database')
 
 const api = supertest(app)
 
+let emmasToken
+
 beforeAll(async () => {
     await database.clearDatabaseIfNotEmpty()
     await database.initializeDatabaseWithTestData()
+
+    // Customer login:
+    const customerLoginInfo = {
+        email: "emma@suomi.fi",
+        password: "emmansalasana"
+    }
+
+    const response = await api
+        .post('/api/customers/login')
+        .send(customerLoginInfo)
+        .expect(200)
+
+    const customer = response.body
+    expect(customer.token.length > 20).toBe(true)
+    expect(customer.name).toBe('Emma')
+
+    // Save the token:
+    emmasToken = customer.token
 });
 
 test('ordersGETdetails-endpoint returns the order asked, with product details', async () => {
@@ -38,15 +58,15 @@ test('ordersGET-endpoint returns all orders', async () => {
     .toBeDefined();
 })
 
-test('ordersGETundispatched-endpoint returns all undispatched orders', async () => {
+test('ordersGETdispatched-endpoint returns all dispatched orders', async () => {
     const response = await api
-    .get('/api/orders/undispatched')
+    .get('/api/orders/dispatched')
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
-    expect(response.body).toHaveLength(2)
+    expect(response.body).toHaveLength(1)
     expect(response.body.find(order => order.customerinstructions === 'Tilaus joka on jo toimitettu.'))
-    .toBeUndefined();
+    .toBeDefined();
 })
 
 test('ordersGETundispatchedWithDetails-endpoint returns all undispatched orders, with product details', async () => {
@@ -68,7 +88,8 @@ test('ordersGETundispatchedWithDetails-endpoint returns all undispatched orders,
 
 test('ordersGETofCustomerWithDetails-endpoint returns all orders of a given customer, with product details', async () => {
     const response = await api
-    .get('/api/orders/ofCustomerWithDetails/1')
+    .get('/api/orders/ofCustomerWithDetails')
+    .set('authorization', 'Bearer ' + emmasToken)
     .expect(200)
     .expect('Content-Type', /application\/json/)
 
@@ -99,12 +120,14 @@ describe('ordersPOST-endpoint', () => {
         
         const response = await api
         .post('/api/orders/')
+        .set('authorization', 'Bearer ' + emmasToken)
         .send(newOrder)
         .expect(200)
 
         // Let's make another HTTP request to verify that the pervious one was succesful:
         const response2 = await api
-        .get('/api/orders/ofCustomerWithDetails/1')
+        .get('/api/orders/ofCustomerWithDetails')
+        .set('authorization', 'Bearer ' + emmasToken)
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
@@ -132,12 +155,14 @@ describe('ordersPOST-endpoint', () => {
         
         const response = await api
         .post('/api/orders/')
+        .set('authorization', 'Bearer ' + emmasToken)
         .send(newOrder)
         .expect(200)
 
         // Let's make another HTTP request to verify that the pervious one was succesful:
         const response2 = await api
-        .get('/api/orders/ofCustomerWithDetails/1')
+        .get('/api/orders/ofCustomerWithDetails')
+        .set('authorization', 'Bearer ' + emmasToken)
         .expect(200)
         .expect('Content-Type', /application\/json/)
 
