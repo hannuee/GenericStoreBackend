@@ -63,7 +63,10 @@ console.log('LOGIN EMAIL:')
 console.log(customerToLogin.email.trim())
   // Admin login:
   if (config.ADMIN_EMAIL === customerToLogin.email.trim()) {
+console.log('ENV PASS HASH:')
+console.log(config.ADMIN_PASSWORD_HASH)
     const adminPasswordCorrect = await bcrypt.compare(customerToLogin.password, config.ADMIN_PASSWORD_HASH)
+console.log(adminPasswordCorrect)
     if (!adminPasswordCorrect) return response.status(401).json({ error: 'Incorrect email or password' })
 
     const adminToken = jwt.sign(
