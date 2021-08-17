@@ -53,7 +53,8 @@ router.post('/', validateRequestBody, async (request, response) => {
 // Login
 router.post('/login', validateRequestBody, async (request, response) => {
   const customerToLogin = request.body
-
+console.log('PALVELIN SAA PASSUN:')
+console.log(customerToLogin.password)  // TESTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
   // Admin login:
   if (config.ADMIN_EMAIL === customerToLogin.email.trim()) {
     const adminPasswordCorrect = await bcrypt.compare(customerToLogin.password, config.ADMIN_PASSWORD_HASH)
@@ -64,7 +65,8 @@ router.post('/login', validateRequestBody, async (request, response) => {
         admin: true,
       },
       process.env.SECRET, { expiresIn: "6h" })
-  
+console.log('PALVELIN ANTAA TOKENIN:')
+console.log(adminToken)
     return response.status(200).send({ token: adminToken, admin: true })
   }
 
