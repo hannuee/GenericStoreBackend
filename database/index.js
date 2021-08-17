@@ -2,9 +2,21 @@ const config = require('../utils/config')
 const { Pool } = require('pg')
 const e = require('express')
 
-const pool = new Pool({
+let poolConfig
+if (config.NODE_ENV === 'production') {
+  poolConfig = {
+    connectionString: config.DATABASE_URL,
+    ssl: {
+      rejectUnauthorized: false
+    }
+  }
+} else {
+  poolConfig = {
     connectionString: config.DATABASE_URL
-})
+  }
+}
+
+const pool = new Pool(poolConfig)
 
 const destructDatabaseStatements = [
   'DROP TABLE public.ProductOrder',
@@ -66,8 +78,8 @@ const testDataInsertStatements = [
   'VALUES (1, \'Nissan Leaf\', \'An electric car.\', \'[{\"price\": 3800000, \"size": \"5 seater\"}]\', TRUE)',
   'INSERT INTO public.Product (category_id, name, description, pricesAndSizes, available)' +
   'VALUES (1, \'Nissan Micra\', \'A small car.\', \'[{\"price\": 1800000, \"size": \"5 seater\"}]\', FALSE)',
-  'INSERT INTO public.Product (category_id, name, description, pricesAndSizes, available)' +
-  'VALUES (3, \'Toyota Landcruiser\', \'An SUV.\', \'[{\"price\": 8000000, \"size": \"5 seater\"}, {\"price\": 12000000, \"size\": \"7 seater\"}]\', TRUE)',
+  'INSERT INTO public.Product (category_id, name, description, pricesAndSizes, available, picture)' +
+  'VALUES (3, \'Toyota Landcruiser\', \'An SUV.\', \'[{\"price\": 8000000, \"size": \"5 seater\"}, {\"price\": 12000000, \"size\": \"7 seater\"}]\', TRUE, \'{\"URL\": \"reptile.jpg\", \"desc\": \"Green reptile\"}\')',
 
   'INSERT INTO public.Customer (name, address, mobile, email, passwordHash)' +
   'VALUES (\'Emma\', \'Finland\', \'050 1234567\', \'emma@suomi.fi\', \'\$2b\$10\$hE30LgwiIpN8d2u9uxf./OrKN0F8Hw1vIrYWlpGAYxyYZkjLrRq3S\')',  // emmansalasana

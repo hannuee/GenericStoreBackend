@@ -56,10 +56,7 @@ router.post('/login', validateRequestBody, async (request, response) => {
 
   // Admin login:
   if (config.ADMIN_EMAIL === customerToLogin.email.trim()) {
-console.log('ENV PASS HASH:')
-console.log(config.ADMIN_PASSWORD_HASH)
     const adminPasswordCorrect = await bcrypt.compare(customerToLogin.password, config.ADMIN_PASSWORD_HASH)
-console.log(adminPasswordCorrect)
     if (!adminPasswordCorrect) return response.status(401).json({ error: 'Incorrect email or password' })
 
     const adminToken = jwt.sign(
@@ -67,8 +64,7 @@ console.log(adminPasswordCorrect)
         admin: true,
       },
       process.env.SECRET, { expiresIn: "6h" })
-console.log('PALVELIN ANTAA TOKENIN:')
-console.log(adminToken)
+
     return response.status(200).send({ token: adminToken, admin: true })
   }
 
