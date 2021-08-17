@@ -28,6 +28,7 @@ beforeAll(async () => {
     expect(admin.admin).toBe(true)
 
     // Save the token:
+    console.log('MUISTIIN: ' + admin.token)
     adminsToken = admin.token
 
 
@@ -51,6 +52,8 @@ beforeAll(async () => {
 });
 
 test('ordersGETdetails-endpoint returns the order asked, with product details', async () => {
+console.log('MUISTISTA: ' + adminsToken)
+
     const response = await api
     .get('/api/orders/details/2')
     .set('authorization', 'Bearer ' + adminsToken)
