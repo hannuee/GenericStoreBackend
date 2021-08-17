@@ -53,14 +53,7 @@ router.post('/', validateRequestBody, async (request, response) => {
 // Login
 router.post('/login', validateRequestBody, async (request, response) => {
   const customerToLogin = request.body
-console.log('PALVELIN SAA PASSUN:') // TESTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
-console.log(customerToLogin.password)  // TESTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTTT
 
-console.log('ENV EMAIL:')
-console.log(config.ADMIN_EMAIL)
-
-console.log('LOGIN EMAIL:')
-console.log(customerToLogin.email.trim())
   // Admin login:
   if (config.ADMIN_EMAIL === customerToLogin.email.trim()) {
 console.log('ENV PASS HASH:')
