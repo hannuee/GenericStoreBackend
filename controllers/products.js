@@ -9,7 +9,7 @@ router.get('/', authorizeAdmin, async (request, response) => {
     queryResult = await database.query('SELECT * FROM public.Product')
     } catch (error) {
       return response.status(500).json({ error: 'Database error'})
-    }
+    } 
     return response.json(queryResult.rows)
 })
 
