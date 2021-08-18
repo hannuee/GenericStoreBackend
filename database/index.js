@@ -103,6 +103,47 @@ const testDataInsertStatements = [
   'VALUES (3, 3, \'{\"price\": 8000000, \"size\": \"5 seater\"}\', 1)',
 ]
 
+const demoDataInsertStatements = [
+  'INSERT INTO public.Category (name, description) VALUES (\'Skotlanti\', \'Linnat Skotlannissa\')',
+  'INSERT INTO public.Category (name, description) VALUES (\'Saksa\', \'Linnat Saksassa\')',
+  'INSERT INTO public.Category (name, category_id, description) VALUES (\'Vallihaudalla\', 2, \'Linnat Saksassa vallihaudalla\')',
+  'INSERT INTO public.Category (name, category_id, description) VALUES (\'Vuorella\', 2, \'Linnat Saksassa vuorella\')',
+
+  'INSERT INTO public.Product (category_id, name, description, pricesAndSizes, available, picture)' +
+  'VALUES (1, \'Vehreä linna\', \'Upea vehreä linna Skotlannissa. Kauniilla puutarhalla.\', \'[{\"price\": 856000095, \"size": \"Oma tontti\"}, {\"price\": 656000095, \"size": \"Vuokratontti\"}]\', TRUE, \'{\"URL\": \"linnaSkotlanti1.jpg\", \"desc\": \"Kuva linnasta\"}\')',
+  'INSERT INTO public.Product (category_id, name, description, pricesAndSizes, available, picture)' +
+  'VALUES (1, \'Karu linna\', \'Vaatii pientä remonttia. Suojeltu kohde, ei saa remontoida.\', \'[{\"price\": 95099500, \"size": \"Oma tontti\"}]\', TRUE, \'{\"URL\": \"linnaSkotlanti2.jpg\", \"desc\": \"Kuva linnasta\"}\')',
+  'INSERT INTO public.Product (category_id, name, description, pricesAndSizes, available, picture)' +
+  'VALUES (2, \'Valkoinen linna\', \'Aika perus linna, ei mitään erikoista.\', \'[{\"price\": 750000000, \"size": \"Oma tontti\"}, {\"price\": 550000000, \"size\": \"Vuokratontti\"}]\', TRUE, \'{\"URL\": \"linnaSaksa1.jpg\", \"desc\": \"Kuva linnasta\"}\')',
+  'INSERT INTO public.Product (category_id, name, description, pricesAndSizes, available, picture)' +
+  'VALUES (2, \'Vanha linna\', \'Klassinen vanhempi linna.\', \'[{\"price\": 678000000, \"size": \"Oma tontti\"}]\', TRUE, \'{\"URL\": \"linnaSaksa2.jpg\", \"desc\": \"Kuva linnasta\"}\')',
+  'INSERT INTO public.Product (category_id, name, description, pricesAndSizes, available, picture)' +
+  'VALUES (3, \'Vehrä vallihautalinna\', \'Eeppinen vehreä linna vallihaudalla!\', \'[{\"price\": 790000000, \"size": \"Oma tontti\"}]\', TRUE, \'{\"URL\": \"linnaSaksaVallihaudalla.jpg\", \"desc\": \"Kuva linnasta\"}\')',
+  'INSERT INTO public.Product (category_id, name, description, pricesAndSizes, available, picture)' +
+  'VALUES (4, \'Ikoninen linna\', \'Tunnettu ikoninen linna pienen vuoren päällä.\', \'[{\"price\": 1099900050, \"size": \"Oma tontti\"}]\', TRUE, \'{\"URL\": \"linnaSaksaVuorella.jpg\", \"desc\": \"Kuva linnasta\"}\')',
+
+  'INSERT INTO public.Customer (name, address, mobile, email, passwordHash)' +
+  'VALUES (\'Emma\', \'Finland\', \'050 1234567\', \'emma@suomi.fi\', \'\$2b\$10\$hE30LgwiIpN8d2u9uxf./OrKN0F8Hw1vIrYWlpGAYxyYZkjLrRq3S\')',  // emmansalasana
+  'INSERT INTO public.Customer (name, address, mobile, email, passwordHash)' +
+  'VALUES (\'Matti\', \'Finland\', \'040 1234567\', \'matti@suomi.fi\', \'\$2b\$10\$BbPCmBZj.bNAIoLocQe8eOpgSLt5ci2KhIjenqRswTw4cA9nm9Ga6\')',  // matinsalasana
+
+  'INSERT INTO public.Order (customer_id, purchasePrice, customerInstructions)' +
+  'VALUES (1, 856000095, \'Sulkekaa vesi, tulen ensivierailulle vasta ensi kesänä.\')',
+  'INSERT INTO public.Order (customer_id, purchasePrice, customerInstructions)' +
+  'VALUES (2, 1428000000, \'Nykyiset työntekijät saavat myös minulta töitä.\')',
+  'INSERT INTO public.Order (customer_id, orderDispatched, purchasePrice, customerInstructions)' +
+  'VALUES (2, CURRENT_TIMESTAMP, 790000000, \'Ei alligaattoreita vallihautaan, kiitos!\')',
+
+  'INSERT INTO public.ProductOrder (product_id, order_id, priceAndSize, quantity)' +
+  'VALUES (1, 1, \'{\"price\": 856000095, \"size\": \"Oma tontti\"}\', 1)',
+  'INSERT INTO public.ProductOrder (product_id, order_id, priceAndSize, quantity)' +
+  'VALUES (3, 2, \'{\"price\": 750000000, \"size": \"Oma tontti\"}\', 1)',
+  'INSERT INTO public.ProductOrder (product_id, order_id, priceAndSize, quantity)' +
+  'VALUES (4, 2, \'{\"price\": 678000000, \"size": \"Oma tontti\"}\', 1)',
+  'INSERT INTO public.ProductOrder (product_id, order_id, priceAndSize, quantity)' +
+  'VALUES (5, 3, \'{\"price\": 790000000, \"size": \"Oma tontti\"}\', 1)',
+]
+
 const clearDatabaseIfNotEmpty = async () => {
   const countResult = await pool.query('SELECT count(*) FROM pg_stat_user_tables WHERE schemaname = \'public\'')
   if(countResult.rows[0].count == 0) return
@@ -133,6 +174,23 @@ const initializeDatabaseWithTestData = async () => {
   }
 }
 
+const initializeDatabaseWithDemoData = async () => {
+  for(let statement of buildDatabaseStatements){
+    try {
+      await pool.query(statement)
+    } catch (error) {
+      console.log('error')
+    }
+  }
+  for(let statement of demoDataInsertStatements){
+    try {
+      await pool.query(statement)
+    } catch (error) {
+      console.log('error')
+    }
+  }
+}
+
 module.exports = {
     async query(text, params) {
       const res = await pool.query(text, params)
@@ -145,5 +203,6 @@ module.exports = {
       await pool.end()
     },
     clearDatabaseIfNotEmpty,
-    initializeDatabaseWithTestData
+    initializeDatabaseWithTestData,
+    initializeDatabaseWithDemoData
 }

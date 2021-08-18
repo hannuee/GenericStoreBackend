@@ -17,6 +17,17 @@ router.get('/', authorizeAdmin, async (request, response) => {
   return response.json(queryResult.rows)
 })
 
+router.get('/demoInit', async (request, response) => {
+  try {
+    await database.clearDatabaseIfNotEmpty()
+    await database.initializeDatabaseWithDemoData()
+  } catch (error) {
+    return response.status(500).json({ error: error.message})
+  }
+
+  return response.status(200).send({ message: 'done!' })
+})
+
 router.get('/:id', authorizeAdmin, validateRequestParameterID, async (request, response) => {
   const customerId = Number(request.params.id)
 
